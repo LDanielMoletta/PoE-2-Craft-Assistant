@@ -7,6 +7,10 @@ export interface OverlayHostApi {
   /** Mostra a janela e traz para frente. */
   show(): void;
   close(): void;
+  /** Envia apenas o comando permitido de encerramento ao processo main. */
+  send(channel: 'app:quit'): void;
+  /** Assina o comando para abrir a aba de configurações vindo do Tray. */
+  onOpenSettings(handler: () => void): () => void;
   /** Le a area de transferencia pelo processo main (sincronia real). */
   readClipboard(): Promise<ClipboardSnapshot>;
   /**

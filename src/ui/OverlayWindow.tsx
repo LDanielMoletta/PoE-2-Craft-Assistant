@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import type { HotkeyAction, UserConfig } from '../config/index.js';
 import type { HotkeyValidation } from '../overlay/hotkeyValidation.js';
@@ -85,6 +85,14 @@ export function OverlayWindow(props: OverlayWindowProps): ReactNode {
 
   const [tab, setTab] = useState<'craft' | 'settings' | 'feedback'>('craft');
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = window.electron?.onOpenSettings(() => {
+      setTab('settings');
+      setMenuOpen(false);
+    });
+    return () => unsubscribe?.();
+  }, []);
 
   const opacity = config.ui.opacity;
   const scale = config.ui.fontScale;
@@ -193,6 +201,9 @@ export function OverlayWindow(props: OverlayWindowProps): ReactNode {
               </MenuItem>
               <MenuItem onClick={() => { onClose(); setMenuOpen(false); }}>
                 Fechar overlay
+              </MenuItem>
+              <MenuItem onClick={() => { window.electron?.send('app:quit'); setMenuOpen(false); }}>
+                Sair do Assistente
               </MenuItem>
             </div>
           )}

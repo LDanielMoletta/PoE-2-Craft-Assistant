@@ -15,6 +15,15 @@ const electronApi = {
   hide: () => ipcRenderer.invoke('overlay:hide'),
   show: () => ipcRenderer.invoke('overlay:show'),
   close: () => ipcRenderer.invoke('overlay:close'),
+  send: (channel) => {
+    if (channel === 'app:quit') ipcRenderer.send(channel);
+  },
+  onOpenSettings: (handler) => {
+    if (typeof handler !== 'function') return () => {};
+    const listener = () => handler();
+    ipcRenderer.on('overlay:open-settings', listener);
+    return () => ipcRenderer.removeListener('overlay:open-settings', listener);
+  },
   readClipboard: () => ipcRenderer.invoke('clipboard:read'),
   readConfig: () => ipcRenderer.invoke('config:read'),
   writeConfig: (contents) => ipcRenderer.invoke('config:write', contents),

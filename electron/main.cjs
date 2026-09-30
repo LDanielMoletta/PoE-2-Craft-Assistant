@@ -1,9 +1,9 @@
 'use strict';
 
-const { app, BrowserWindow, clipboard, globalShortcut, ipcMain, screen, shell, Tray, Menu, nativeImage } = require('electron');
+const { app, BrowserWindow, clipboard, globalShortcut, ipcMain, screen, shell, Tray, Menu, nativeImage, Notification } = require('electron');
 const { mkdirSync, readFileSync, renameSync, unlinkSync, watch, writeFileSync } = require('node:fs');
 const path = require('node:path');
-const { execSync } = require('node:child_process');
+const { execFileSync, execSync } = require('node:child_process');
 
 // Desabilita caches de GPU/HTTP para ambiente de teste mais limpo
 app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
@@ -16,7 +16,7 @@ const { deliverFeedback } = require('./feedbackDelivery.cjs');
 /**
  * Verifica se o Path of Exile 2 esta com foco no Windows.
  * Usa PowerShell para obter o processo da janela em primeiro plano.
- * Retorna true se o processo ativo for PathOfExile2.exe ou PathOfExile2_x64.exe.
+ * Retorna true se o nome do processo ativo contiver PathOfExile ou poe2.
  * Em modo dev (VITE_DEV_SERVER_URL), ignora a checagem para permitir teste sem o jogo.
  */
 function isPoE2Focused() {
@@ -46,9 +46,15 @@ function isPoE2Focused() {
       timeout: 1000,
       stdio: ['ignore', 'pipe', 'ignore']
     }).trim();
-    return result === 'PathOfExile2' || result === 'PathOfExile2_x64';
-  } catch {
-    return false;
+    if (!result) {
+      console.warn('[MAIN] Nao foi possivel identificar o processo em foco; liberando hotkey como fallback.');
+      return true;
+    }
+    const processName = result.toLowerCase();
+    return processName.includes('pathofexile') || processName.includes('poe2');
+  } catch (error) {
+    console.warn('[MAIN] Falha ao detectar o processo em foco; liberando hotkey como fallback:', error);
+    return true;
   }
 }
 
@@ -77,6 +83,43 @@ let mainHotkeys = null;
 let currentLog = null;
 let devItemWatcher = null;
 let devItemReadTimer = null;
+let gameMonitor = null;
+let gameWasDetected = false;
+
+function isPoE2ProcessRunning() {
+  const output = execFileSync('tasklist', ['/FO', 'CSV', '/NH'], {
+    encoding: 'utf8',
+    timeout: 5000,
+    windowsHide: true,
+  });
+  return output.split(/\r?\n/).some((line) => {
+    const imageName = line.match(/^"([^"]+)"/)?.[1]?.toLowerCase();
+    return imageName === 'pathofexile2.exe' || imageName === 'poe2.exe';
+  });
+}
+
+function checkGameLifecycle() {
+  try {
+    if (isPoE2ProcessRunning()) {
+      gameWasDetected = true;
+      return;
+    }
+    if (gameWasDetected) {
+      console.log('[MAIN] Jogo fechado; encerrando o assistente.');
+      if (gameMonitor !== null) clearInterval(gameMonitor);
+      gameMonitor = null;
+      app.quit();
+    }
+  } catch (error) {
+    console.warn('[MAIN] Falha ao verificar o processo do jogo; nova tentativa em 10 segundos:', error);
+  }
+}
+
+function startGameMonitor() {
+  if (process.platform !== 'win32' || gameMonitor !== null) return;
+  checkGameLifecycle();
+  gameMonitor = setInterval(checkGameLifecycle, 10_000);
+}
 
 function createHotkeyManager() {
   return createMainHotkeyManager({
@@ -87,13 +130,13 @@ function createHotkeyManager() {
       // Log do clipboard lido
       logMain('info', '[MAIN] Clipboard lido', { length: payload?.text?.length || 0 });
       
-      // Forca visibilidade do overlay
+      // Forca visibilidade do overlay acima de jogos em tela cheia.
       console.log('[MAIN] Hotkey disparada! Exibindo overlay...');
       if (overlayWindow) {
+        overlayWindow.setAlwaysOnTop(true, 'screen-saver');
         overlayWindow.show();
         overlayWindow.restore();
         overlayWindow.focus();
-        overlayWindow.setAlwaysOnTop(true, 'screen-saver');
       }
       
       // Envia payload parseado para o renderer via IPC
@@ -228,17 +271,31 @@ function createTray() {
   // Por enquanto, usamos um icone vazio e o Electron usa o padrao.
   
   const tray = new Tray(icon.resize({ width: 16, height: 16 }));
+  void app.getFileIcon(process.execPath, { size: 'small' }).then((appIcon) => {
+    if (global.tray === tray) tray.setImage(appIcon.resize({ width: 16, height: 16 }));
+  }).catch((error) => {
+    console.warn('[MAIN] Nao foi possivel carregar o icone do Tray:', error);
+  });
   tray.setToolTip('PoE2 Craft Assistant - Pressione Alt+Q para abrir');
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Abrir Overlay',
+      label: 'Abrir Configurações',
       click: () => {
         showOverlay();
+        if (!overlayWindow) return;
+        const sendOpenSettings = () => {
+          if (!overlayWindow?.isDestroyed()) overlayWindow?.webContents.send('overlay:open-settings');
+        };
+        if (overlayWindow.webContents.isLoadingMainFrame()) {
+          overlayWindow.webContents.once('did-finish-load', sendOpenSettings);
+        } else {
+          sendOpenSettings();
+        }
       },
     },
     {
-      label: 'Sair',
+      label: 'Sair do Assistente',
       click: () => {
         app.quit();
       },
@@ -247,9 +304,10 @@ function createTray() {
 
   tray.setContextMenu(contextMenu);
   
-  // Click no icone da tray abre o overlay
+  // Clique no icone alterna a visibilidade do overlay.
   tray.on('click', () => {
-    showOverlay();
+    if (overlayWindow?.isVisible()) hideOverlay();
+    else showOverlay();
   });
 
   // Guarda referencia para nao ser coletado pelo GC
@@ -377,6 +435,10 @@ function registerIpc() {
     overlayWindow?.close();
   });
 
+  ipcMain.on('app:quit', () => {
+    app.quit();
+  });
+
   // Config e snapshot ficam em disco no main; o renderer recebe texto cru e
   // continua dono da validacao, para nao haver duas copias da verdade.
   ipcMain.handle('config:read', () => readConfig());
@@ -480,6 +542,13 @@ function installGlobalHandlers() {
 }
 
 app.whenReady().then(() => {
+  if (Notification.isSupported()) {
+    new Notification({
+      title: 'PoE 2 Craft Assistant',
+      body: 'Overlay rodando! Pressione a hotkey (Alt+Q) com o mouse sobre um item no jogo.',
+    }).show();
+  }
+
   currentLog = init(app);
   installGlobalHandlers();
   logMain('info', 'app iniciado', {
@@ -498,6 +567,7 @@ app.whenReady().then(() => {
   // System Tray: mostra que o app esta rodando em segundo plano.
   // O usuario pode clicar para abrir o overlay ou sair.
   createTray();
+  startGameMonitor();
 
   // Observa o arquivo temporario usado pelo simulador, apenas com o servidor Vite.
   if (process.env.VITE_DEV_SERVER_URL) {
@@ -510,6 +580,8 @@ app.whenReady().then(() => {
 });
 
 app.on('will-quit', () => {
+  if (gameMonitor !== null) clearInterval(gameMonitor);
+  gameMonitor = null;
   mainHotkeys?.dispose();
   mainHotkeys = null;
   devItemWatcher?.close();
