@@ -1,0 +1,13 @@
+/* Drag region for frameless window */
+.top-drag-region {
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+}
+
+.top-drag-region .no-drag,
+.top-drag-region button,
+.top-drag-region input,
+.top-drag-region select,
+.top-drag-region textarea {
+  -webkit-app-region: no-drag;
+}

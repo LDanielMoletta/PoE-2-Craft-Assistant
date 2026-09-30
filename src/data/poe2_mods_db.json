@@ -1,0 +1,1833 @@
+{
+  "version": 1,
+  "league": "Standard",
+  "updatedAt": "2025-06-01T00:00:00.000Z",
+  "modifiers": [
+    {
+      "id": "flat-fire-damage#prefix#t1",
+      "name": "Flat Fire Damage",
+      "slot": "prefix",
+      "tier": 1,
+      "text": "Flat Fire Damage to Attacks",
+      "value": 15,
+      "requiredItemLevel": 25,
+      "weight": 100,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "fire",
+        "damage",
+        "flat",
+        "attack",
+        "weapon"
+      ]
+    },
+    {
+      "id": "flat-fire-damage#prefix#t2",
+      "name": "Flat Fire Damage",
+      "slot": "prefix",
+      "tier": 2,
+      "text": "Flat Fire Damage to Attacks",
+      "value": 28,
+      "requiredItemLevel": 45,
+      "weight": 100,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "fire",
+        "damage",
+        "flat",
+        "attack",
+        "weapon"
+      ]
+    },
+    {
+      "id": "flat-fire-damage#prefix#t3",
+      "name": "Flat Fire Damage",
+      "slot": "prefix",
+      "tier": 3,
+      "text": "Flat Fire Damage to Attacks",
+      "value": 44,
+      "requiredItemLevel": 65,
+      "weight": 100,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "fire",
+        "damage",
+        "flat",
+        "attack",
+        "weapon"
+      ]
+    },
+    {
+      "id": "flat-fire-damage#prefix#t4",
+      "name": "Flat Fire Damage",
+      "slot": "prefix",
+      "tier": 4,
+      "text": "Flat Fire Damage to Attacks",
+      "value": 66,
+      "requiredItemLevel": 80,
+      "weight": 100,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "fire",
+        "damage",
+        "flat",
+        "attack",
+        "weapon"
+      ]
+    },
+    {
+      "id": "flat-cold-damage#prefix#t1",
+      "name": "Flat Cold Damage",
+      "slot": "prefix",
+      "tier": 1,
+      "text": "Flat Cold Damage to Attacks",
+      "value": 15,
+      "requiredItemLevel": 25,
+      "weight": 100,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "cold",
+        "damage",
+        "flat",
+        "attack",
+        "weapon"
+      ]
+    },
+    {
+      "id": "flat-cold-damage#prefix#t2",
+      "name": "Flat Cold Damage",
+      "slot": "prefix",
+      "tier": 2,
+      "text": "Flat Cold Damage to Attacks",
+      "value": 28,
+      "requiredItemLevel": 45,
+      "weight": 100,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "cold",
+        "damage",
+        "flat",
+        "attack",
+        "weapon"
+      ]
+    },
+    {
+      "id": "flat-cold-damage#prefix#t3",
+      "name": "Flat Cold Damage",
+      "slot": "prefix",
+      "tier": 3,
+      "text": "Flat Cold Damage to Attacks",
+      "value": 44,
+      "requiredItemLevel": 65,
+      "weight": 100,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "cold",
+        "damage",
+        "flat",
+        "attack",
+        "weapon"
+      ]
+    },
+    {
+      "id": "flat-cold-damage#prefix#t4",
+      "name": "Flat Cold Damage",
+      "slot": "prefix",
+      "tier": 4,
+      "text": "Flat Cold Damage to Attacks",
+      "value": 66,
+      "requiredItemLevel": 80,
+      "weight": 100,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "cold",
+        "damage",
+        "flat",
+        "attack",
+        "weapon"
+      ]
+    },
+    {
+      "id": "flat-lightning-damage#prefix#t1",
+      "name": "Flat Lightning Damage",
+      "slot": "prefix",
+      "tier": 1,
+      "text": "Flat Lightning Damage to Attacks",
+      "value": 15,
+      "requiredItemLevel": 25,
+      "weight": 100,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "lightning",
+        "damage",
+        "flat",
+        "attack",
+        "weapon"
+      ]
+    },
+    {
+      "id": "flat-lightning-damage#prefix#t2",
+      "name": "Flat Lightning Damage",
+      "slot": "prefix",
+      "tier": 2,
+      "text": "Flat Lightning Damage to Attacks",
+      "value": 28,
+      "requiredItemLevel": 45,
+      "weight": 100,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "lightning",
+        "damage",
+        "flat",
+        "attack",
+        "weapon"
+      ]
+    },
+    {
+      "id": "flat-lightning-damage#prefix#t3",
+      "name": "Flat Lightning Damage",
+      "slot": "prefix",
+      "tier": 3,
+      "text": "Flat Lightning Damage to Attacks",
+      "value": 44,
+      "requiredItemLevel": 65,
+      "weight": 100,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "lightning",
+        "damage",
+        "flat",
+        "attack",
+        "weapon"
+      ]
+    },
+    {
+      "id": "flat-lightning-damage#prefix#t4",
+      "name": "Flat Lightning Damage",
+      "slot": "prefix",
+      "tier": 4,
+      "text": "Flat Lightning Damage to Attacks",
+      "value": 66,
+      "requiredItemLevel": 80,
+      "weight": 100,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "lightning",
+        "damage",
+        "flat",
+        "attack",
+        "weapon"
+      ]
+    },
+    {
+      "id": "adds-chaos-damage#prefix#t1",
+      "name": "Adds Chaos Damage",
+      "slot": "prefix",
+      "tier": 1,
+      "text": "Flat Chaos Damage to Attacks",
+      "value": 12,
+      "requiredItemLevel": 35,
+      "weight": 60,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "chaos",
+        "damage",
+        "flat",
+        "attack",
+        "weapon",
+        "ailment"
+      ]
+    },
+    {
+      "id": "adds-chaos-damage#prefix#t2",
+      "name": "Adds Chaos Damage",
+      "slot": "prefix",
+      "tier": 2,
+      "text": "Flat Chaos Damage to Attacks",
+      "value": 22,
+      "requiredItemLevel": 55,
+      "weight": 60,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "chaos",
+        "damage",
+        "flat",
+        "attack",
+        "weapon",
+        "ailment"
+      ]
+    },
+    {
+      "id": "adds-chaos-damage#prefix#t3",
+      "name": "Adds Chaos Damage",
+      "slot": "prefix",
+      "tier": 3,
+      "text": "Flat Chaos Damage to Attacks",
+      "value": 38,
+      "requiredItemLevel": 75,
+      "weight": 60,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "chaos",
+        "damage",
+        "flat",
+        "attack",
+        "weapon",
+        "ailment"
+      ]
+    },
+    {
+      "id": "adds-chaos-damage#prefix#t4",
+      "name": "Adds Chaos Damage",
+      "slot": "prefix",
+      "tier": 4,
+      "text": "Flat Chaos Damage to Attacks",
+      "value": 55,
+      "requiredItemLevel": 90,
+      "weight": 60,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw"
+      ],
+      "tags": [
+        "chaos",
+        "damage",
+        "flat",
+        "attack",
+        "weapon",
+        "ailment"
+      ]
+    },
+    {
+      "id": "to-level-of-all-spell-skill-gems#prefix#t1",
+      "name": "to Level of all Spell Skill Gems",
+      "slot": "prefix",
+      "tier": 1,
+      "text": "+1 to Level of all Spell Skill Gems",
+      "value": 1,
+      "requiredItemLevel": 20,
+      "weight": 25,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sceptre",
+        "amulet",
+        "ring",
+        "helmet",
+        "chest",
+        "gloves",
+        "belt"
+      ],
+      "tags": [
+        "level",
+        "spell",
+        "gem",
+        "skill",
+        "caster"
+      ]
+    },
+    {
+      "id": "to-level-of-all-spell-skill-gems#prefix#t2",
+      "name": "to Level of all Spell Skill Gems",
+      "slot": "prefix",
+      "tier": 2,
+      "text": "+2 to Level of all Spell Skill Gems",
+      "value": 2,
+      "requiredItemLevel": 55,
+      "weight": 25,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sceptre",
+        "amulet",
+        "ring",
+        "helmet",
+        "chest",
+        "gloves",
+        "belt"
+      ],
+      "tags": [
+        "level",
+        "spell",
+        "gem",
+        "skill",
+        "caster"
+      ]
+    },
+    {
+      "id": "to-level-of-all-spell-skill-gems#prefix#t3",
+      "name": "to Level of all Spell Skill Gems",
+      "slot": "prefix",
+      "tier": 3,
+      "text": "+3 to Level of all Spell Skill Gems",
+      "value": 3,
+      "requiredItemLevel": 80,
+      "weight": 25,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sceptre",
+        "amulet",
+        "ring",
+        "helmet",
+        "chest",
+        "gloves",
+        "belt"
+      ],
+      "tags": [
+        "level",
+        "spell",
+        "gem",
+        "skill",
+        "caster"
+      ]
+    },
+    {
+      "id": "spell-damage#prefix#t1",
+      "name": "Spell Damage",
+      "slot": "prefix",
+      "tier": 1,
+      "text": "Adds Spell Damage",
+      "value": 12,
+      "requiredItemLevel": 20,
+      "weight": 80,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sceptre"
+      ],
+      "tags": [
+        "spell",
+        "damage",
+        "caster",
+        "weapon"
+      ]
+    },
+    {
+      "id": "spell-damage#prefix#t2",
+      "name": "Spell Damage",
+      "slot": "prefix",
+      "tier": 2,
+      "text": "Adds Spell Damage",
+      "value": 25,
+      "requiredItemLevel": 45,
+      "weight": 80,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sceptre"
+      ],
+      "tags": [
+        "spell",
+        "damage",
+        "caster",
+        "weapon"
+      ]
+    },
+    {
+      "id": "spell-damage#prefix#t3",
+      "name": "Spell Damage",
+      "slot": "prefix",
+      "tier": 3,
+      "text": "Adds Spell Damage",
+      "value": 42,
+      "requiredItemLevel": 65,
+      "weight": 80,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sceptre"
+      ],
+      "tags": [
+        "spell",
+        "damage",
+        "caster",
+        "weapon"
+      ]
+    },
+    {
+      "id": "spell-damage#prefix#t4",
+      "name": "Spell Damage",
+      "slot": "prefix",
+      "tier": 4,
+      "text": "Adds Spell Damage",
+      "value": 65,
+      "requiredItemLevel": 85,
+      "weight": 80,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sceptre"
+      ],
+      "tags": [
+        "spell",
+        "damage",
+        "caster",
+        "weapon"
+      ]
+    },
+    {
+      "id": "increased-cast-speed#suffix#t1",
+      "name": "Increased Cast Speed",
+      "slot": "suffix",
+      "tier": 1,
+      "text": "10% increased Cast Speed",
+      "value": 10,
+      "requiredItemLevel": 20,
+      "weight": 55,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sceptre",
+        "helmet",
+        "gloves",
+        "ring",
+        "amulet",
+        "belt"
+      ],
+      "tags": [
+        "cast",
+        "speed",
+        "caster",
+        "attack",
+        "rate"
+      ]
+    },
+    {
+      "id": "increased-cast-speed#suffix#t2",
+      "name": "Increased Cast Speed",
+      "slot": "suffix",
+      "tier": 2,
+      "text": "15% increased Cast Speed",
+      "value": 15,
+      "requiredItemLevel": 45,
+      "weight": 55,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sceptre",
+        "helmet",
+        "gloves",
+        "ring",
+        "amulet",
+        "belt"
+      ],
+      "tags": [
+        "cast",
+        "speed",
+        "caster",
+        "attack",
+        "rate"
+      ]
+    },
+    {
+      "id": "increased-cast-speed#suffix#t3",
+      "name": "Increased Cast Speed",
+      "slot": "suffix",
+      "tier": 3,
+      "text": "20% increased Cast Speed",
+      "value": 20,
+      "requiredItemLevel": 70,
+      "weight": 55,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sceptre",
+        "helmet",
+        "gloves",
+        "ring",
+        "amulet",
+        "belt"
+      ],
+      "tags": [
+        "cast",
+        "speed",
+        "caster",
+        "attack",
+        "rate"
+      ]
+    },
+    {
+      "id": "increased-attack-speed#suffix#t1",
+      "name": "Increased Attack Speed",
+      "slot": "suffix",
+      "tier": 1,
+      "text": "10% increased Attack Speed",
+      "value": 10,
+      "requiredItemLevel": 20,
+      "weight": 55,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw",
+        "gloves",
+        "belt",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "attack",
+        "speed",
+        "weapon",
+        "rate"
+      ]
+    },
+    {
+      "id": "increased-attack-speed#suffix#t2",
+      "name": "Increased Attack Speed",
+      "slot": "suffix",
+      "tier": 2,
+      "text": "15% increased Attack Speed",
+      "value": 15,
+      "requiredItemLevel": 45,
+      "weight": 55,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw",
+        "gloves",
+        "belt",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "attack",
+        "speed",
+        "weapon",
+        "rate"
+      ]
+    },
+    {
+      "id": "increased-attack-speed#suffix#t3",
+      "name": "Increased Attack Speed",
+      "slot": "suffix",
+      "tier": 3,
+      "text": "20% increased Attack Speed",
+      "value": 20,
+      "requiredItemLevel": 70,
+      "weight": 55,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw",
+        "gloves",
+        "belt",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "attack",
+        "speed",
+        "weapon",
+        "rate"
+      ]
+    },
+    {
+      "id": "critical-strike-chance#suffix#t1",
+      "name": "Critical Strike Chance",
+      "slot": "suffix",
+      "tier": 1,
+      "text": "10% increased Critical Strike Chance",
+      "value": 10,
+      "requiredItemLevel": 25,
+      "weight": 45,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw",
+        "ring",
+        "amulet",
+        "belt",
+        "helmet",
+        "gloves"
+      ],
+      "tags": [
+        "critical",
+        "crit",
+        "chance",
+        "attack"
+      ]
+    },
+    {
+      "id": "critical-strike-chance#suffix#t2",
+      "name": "Critical Strike Chance",
+      "slot": "suffix",
+      "tier": 2,
+      "text": "20% increased Critical Strike Chance",
+      "value": 20,
+      "requiredItemLevel": 55,
+      "weight": 45,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw",
+        "ring",
+        "amulet",
+        "belt",
+        "helmet",
+        "gloves"
+      ],
+      "tags": [
+        "critical",
+        "crit",
+        "chance",
+        "attack"
+      ]
+    },
+    {
+      "id": "critical-strike-chance#suffix#t3",
+      "name": "Critical Strike Chance",
+      "slot": "suffix",
+      "tier": 3,
+      "text": "30% increased Critical Strike Chance",
+      "value": 30,
+      "requiredItemLevel": 80,
+      "weight": 45,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw",
+        "ring",
+        "amulet",
+        "belt",
+        "helmet",
+        "gloves"
+      ],
+      "tags": [
+        "critical",
+        "crit",
+        "chance",
+        "attack"
+      ]
+    },
+    {
+      "id": "increased-elemental-damage#suffix#t1",
+      "name": "increased Elemental Damage",
+      "slot": "suffix",
+      "tier": 1,
+      "text": "15% increased Elemental Damage",
+      "value": 15,
+      "requiredItemLevel": 25,
+      "weight": 70,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw",
+        "ring",
+        "amulet",
+        "belt"
+      ],
+      "tags": [
+        "elemental",
+        "damage",
+        "increased"
+      ]
+    },
+    {
+      "id": "increased-elemental-damage#suffix#t2",
+      "name": "increased Elemental Damage",
+      "slot": "suffix",
+      "tier": 2,
+      "text": "25% increased Elemental Damage",
+      "value": 25,
+      "requiredItemLevel": 50,
+      "weight": 70,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw",
+        "ring",
+        "amulet",
+        "belt"
+      ],
+      "tags": [
+        "elemental",
+        "damage",
+        "increased"
+      ]
+    },
+    {
+      "id": "increased-elemental-damage#suffix#t3",
+      "name": "increased Elemental Damage",
+      "slot": "suffix",
+      "tier": 3,
+      "text": "35% increased Elemental Damage",
+      "value": 35,
+      "requiredItemLevel": 75,
+      "weight": 70,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "sword",
+        "axe",
+        "mace",
+        "sceptre",
+        "dagger",
+        "claw",
+        "ring",
+        "amulet",
+        "belt"
+      ],
+      "tags": [
+        "elemental",
+        "damage",
+        "increased"
+      ]
+    },
+    {
+      "id": "to-maximum-mana#suffix#t1",
+      "name": "to Maximum Mana",
+      "slot": "suffix",
+      "tier": 1,
+      "text": "+30 to Maximum Mana",
+      "value": 30,
+      "requiredItemLevel": 20,
+      "weight": 65,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "belt",
+        "ring",
+        "amulet",
+        "wand",
+        "staff"
+      ],
+      "tags": [
+        "mana",
+        "maximum",
+        "flat",
+        "defence"
+      ]
+    },
+    {
+      "id": "to-maximum-mana#suffix#t2",
+      "name": "to Maximum Mana",
+      "slot": "suffix",
+      "tier": 2,
+      "text": "+50 to Maximum Mana",
+      "value": 50,
+      "requiredItemLevel": 45,
+      "weight": 65,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "belt",
+        "ring",
+        "amulet",
+        "wand",
+        "staff"
+      ],
+      "tags": [
+        "mana",
+        "maximum",
+        "flat",
+        "defence"
+      ]
+    },
+    {
+      "id": "to-maximum-mana#suffix#t3",
+      "name": "to Maximum Mana",
+      "slot": "suffix",
+      "tier": 3,
+      "text": "+80 to Maximum Mana",
+      "value": 80,
+      "requiredItemLevel": 70,
+      "weight": 65,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "belt",
+        "ring",
+        "amulet",
+        "wand",
+        "staff"
+      ],
+      "tags": [
+        "mana",
+        "maximum",
+        "flat",
+        "defence"
+      ]
+    },
+    {
+      "id": "to-maximum-mana#suffix#t4",
+      "name": "to Maximum Mana",
+      "slot": "suffix",
+      "tier": 4,
+      "text": "+120 to Maximum Mana",
+      "value": 120,
+      "requiredItemLevel": 90,
+      "weight": 65,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "belt",
+        "ring",
+        "amulet",
+        "wand",
+        "staff"
+      ],
+      "tags": [
+        "mana",
+        "maximum",
+        "flat",
+        "defence"
+      ]
+    },
+    {
+      "id": "to-maximum-life#suffix#t1",
+      "name": "to Maximum Life",
+      "slot": "suffix",
+      "tier": 1,
+      "text": "+40 to Maximum Life",
+      "value": 40,
+      "requiredItemLevel": 20,
+      "weight": 65,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "boots",
+        "belt",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "life",
+        "maximum",
+        "flat",
+        "defence"
+      ]
+    },
+    {
+      "id": "to-maximum-life#suffix#t2",
+      "name": "to Maximum Life",
+      "slot": "suffix",
+      "tier": 2,
+      "text": "+70 to Maximum Life",
+      "value": 70,
+      "requiredItemLevel": 45,
+      "weight": 65,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "boots",
+        "belt",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "life",
+        "maximum",
+        "flat",
+        "defence"
+      ]
+    },
+    {
+      "id": "to-maximum-life#suffix#t3",
+      "name": "to Maximum Life",
+      "slot": "suffix",
+      "tier": 3,
+      "text": "+110 to Maximum Life",
+      "value": 110,
+      "requiredItemLevel": 70,
+      "weight": 65,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "boots",
+        "belt",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "life",
+        "maximum",
+        "flat",
+        "defence"
+      ]
+    },
+    {
+      "id": "to-maximum-life#suffix#t4",
+      "name": "to Maximum Life",
+      "slot": "suffix",
+      "tier": 4,
+      "text": "+170 to Maximum Life",
+      "value": 170,
+      "requiredItemLevel": 90,
+      "weight": 65,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "boots",
+        "belt",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "life",
+        "maximum",
+        "flat",
+        "defence"
+      ]
+    },
+    {
+      "id": "to-all-attributes#suffix#t1",
+      "name": "to all Attributes",
+      "slot": "suffix",
+      "tier": 1,
+      "text": "+5 to all Attributes",
+      "value": 5,
+      "requiredItemLevel": 30,
+      "weight": 12,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "boots",
+        "belt",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "attribute",
+        "str",
+        "dex",
+        "int",
+        "all"
+      ]
+    },
+    {
+      "id": "to-all-attributes#suffix#t2",
+      "name": "to all Attributes",
+      "slot": "suffix",
+      "tier": 2,
+      "text": "+10 to all Attributes",
+      "value": 10,
+      "requiredItemLevel": 60,
+      "weight": 12,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "boots",
+        "belt",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "attribute",
+        "str",
+        "dex",
+        "int",
+        "all"
+      ]
+    },
+    {
+      "id": "to-all-attributes#suffix#t3",
+      "name": "to all Attributes",
+      "slot": "suffix",
+      "tier": 3,
+      "text": "+16 to all Attributes",
+      "value": 16,
+      "requiredItemLevel": 85,
+      "weight": 12,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "boots",
+        "belt",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "attribute",
+        "str",
+        "dex",
+        "int",
+        "all"
+      ]
+    },
+    {
+      "id": "to-fire-resistance#suffix#t1",
+      "name": "to Fire Resistance",
+      "slot": "suffix",
+      "tier": 1,
+      "text": "+15% to Fire Resistance",
+      "value": 15,
+      "requiredItemLevel": 20,
+      "weight": 40,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "boots",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "resistance",
+        "fire",
+        "defence"
+      ]
+    },
+    {
+      "id": "to-fire-resistance#suffix#t2",
+      "name": "to Fire Resistance",
+      "slot": "suffix",
+      "tier": 2,
+      "text": "+25% to Fire Resistance",
+      "value": 25,
+      "requiredItemLevel": 45,
+      "weight": 40,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "boots",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "resistance",
+        "fire",
+        "defence"
+      ]
+    },
+    {
+      "id": "to-fire-resistance#suffix#t3",
+      "name": "to Fire Resistance",
+      "slot": "suffix",
+      "tier": 3,
+      "text": "+38% to Fire Resistance",
+      "value": 38,
+      "requiredItemLevel": 70,
+      "weight": 40,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "boots",
+        "ring",
+        "amulet"
+      ],
+      "tags": [
+        "resistance",
+        "fire",
+        "defence"
+      ]
+    },
+    {
+      "id": "to-spell-suppression#suffix#t1",
+      "name": "to Spell Suppression",
+      "slot": "suffix",
+      "tier": 1,
+      "text": "5% increased Spell Suppression Chance",
+      "value": 5,
+      "requiredItemLevel": 35,
+      "weight": 30,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "boots"
+      ],
+      "tags": [
+        "suppression",
+        "spell",
+        "defence"
+      ]
+    },
+    {
+      "id": "to-spell-suppression#suffix#t2",
+      "name": "to Spell Suppression",
+      "slot": "suffix",
+      "tier": 2,
+      "text": "10% increased Spell Suppression Chance",
+      "value": 10,
+      "requiredItemLevel": 65,
+      "weight": 30,
+      "itemClasses": [
+        "helmet",
+        "chest",
+        "gloves",
+        "boots"
+      ],
+      "tags": [
+        "suppression",
+        "spell",
+        "defence"
+      ]
+    },
+    {
+      "id": "chance-to-ignite#suffix#t1",
+      "name": "chance to Ignite",
+      "slot": "suffix",
+      "tier": 1,
+      "text": "20% chance to Ignite",
+      "value": 20,
+      "requiredItemLevel": 35,
+      "weight": 30,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "ring",
+        "amulet",
+        "belt",
+        "gloves",
+        "helmet"
+      ],
+      "tags": [
+        "ignite",
+        "ailment",
+        "chance",
+        "fire"
+      ]
+    },
+    {
+      "id": "chance-to-ignite#suffix#t2",
+      "name": "chance to Ignite",
+      "slot": "suffix",
+      "tier": 2,
+      "text": "30% chance to Ignite",
+      "value": 30,
+      "requiredItemLevel": 60,
+      "weight": 30,
+      "itemClasses": [
+        "wand",
+        "staff",
+        "bow",
+        "ring",
+        "amulet",
+        "belt",
+        "gloves",
+        "helmet"
+      ],
+      "tags": [
+        "ignite",
+        "ailment",
+        "chance",
+        "fire"
+      ]
+    }
+  ],
+  "bases": [
+    {
+      "id": "base:wand",
+      "name": "Wand",
+      "itemClass": "wand",
+      "maxPrefixes": 2,
+      "maxSuffixes": 3,
+      "baseNames": [
+        "Crackling Wand",
+        "Slicing Wand",
+        "Tornado Wand"
+      ]
+    },
+    {
+      "id": "base:staff",
+      "name": "Staff",
+      "itemClass": "staff",
+      "maxPrefixes": 2,
+      "maxSuffixes": 3,
+      "baseNames": [
+        "Long Staff",
+        "Coiled Staff",
+        "Judgement Staff"
+      ]
+    },
+    {
+      "id": "base:bow",
+      "name": "Bow",
+      "itemClass": "bow",
+      "maxPrefixes": 2,
+      "maxSuffixes": 3,
+      "baseNames": [
+        "Short Bow",
+        "Composite Bow",
+        "Gemini Bow"
+      ]
+    },
+    {
+      "id": "base:sword",
+      "name": "Sword",
+      "itemClass": "sword",
+      "maxPrefixes": 3,
+      "maxSuffixes": 3,
+      "baseNames": [
+        "Rusted Sword",
+        "Vaal Blade",
+        "Exquisite Blade"
+      ]
+    },
+    {
+      "id": "base:axe",
+      "name": "Axe",
+      "itemClass": "axe",
+      "maxPrefixes": 3,
+      "maxSuffixes": 3,
+      "baseNames": [
+        "Rusted Axe",
+        "Siege Axe",
+        "Vaal Axe"
+      ]
+    },
+    {
+      "id": "base:mace",
+      "name": "Mace",
+      "itemClass": "mace",
+      "maxPrefixes": 3,
+      "maxSuffixes": 3,
+      "baseNames": [
+        "Driftwood Club",
+        "Forge Maul",
+        "Caged Mace"
+      ]
+    },
+    {
+      "id": "base:sceptre",
+      "name": "Sceptre",
+      "itemClass": "sceptre",
+      "maxPrefixes": 2,
+      "maxSuffixes": 3,
+      "baseNames": [
+        "Worn Sceptre",
+        "Ochre Sceptre",
+        "Sovereign Sceptre"
+      ]
+    },
+    {
+      "id": "base:dagger",
+      "name": "Dagger",
+      "itemClass": "dagger",
+      "maxPrefixes": 2,
+      "maxSuffixes": 3,
+      "baseNames": [
+        "Ambusher Dagger",
+        "Glass Shank",
+        "Imperial Skean"
+      ]
+    },
+    {
+      "id": "base:claw",
+      "name": "Claw",
+      "itemClass": "claw",
+      "maxPrefixes": 2,
+      "maxSuffixes": 3,
+      "baseNames": [
+        "Nailed Claw",
+        "Bear Claw",
+        "Twin Claw"
+      ]
+    },
+    {
+      "id": "base:chest",
+      "name": "Corpo",
+      "itemClass": "chest",
+      "maxPrefixes": 3,
+      "maxSuffixes": 3,
+      "baseNames": [
+        "Simple Robe",
+        "Plate Vest",
+        "Grand Regalia"
+      ]
+    },
+    {
+      "id": "base:helmet",
+      "name": "Elmo",
+      "itemClass": "helmet",
+      "maxPrefixes": 3,
+      "maxSuffixes": 3,
+      "baseNames": [
+        "Iron Hat",
+        "Leather Cap",
+        "Fossilised Spirit Shield"
+      ]
+    },
+    {
+      "id": "base:gloves",
+      "name": "Luvas",
+      "itemClass": "gloves",
+      "maxPrefixes": 2,
+      "maxSuffixes": 2,
+      "baseNames": [
+        "Silk Gloves",
+        "Plated Gauntlets",
+        "Gripped Gloves"
+      ]
+    },
+    {
+      "id": "base:boots",
+      "name": "Botas",
+      "itemClass": "boots",
+      "maxPrefixes": 2,
+      "maxSuffixes": 2,
+      "baseNames": [
+        "Worn Boots",
+        "Iron Greaves",
+        "Slink Boots"
+      ]
+    },
+    {
+      "id": "base:shield",
+      "name": "Escudo",
+      "itemClass": "shield",
+      "maxPrefixes": 2,
+      "maxSuffixes": 2,
+      "baseNames": [
+        "Tarnished Buckler",
+        "Jade Kite",
+        "Rawhide Buckler"
+      ]
+    },
+    {
+      "id": "base:quiver",
+      "name": "Aljava",
+      "itemClass": "quiver",
+      "maxPrefixes": 2,
+      "maxSuffixes": 2,
+      "baseNames": [
+        "Slim Quiver",
+        "Broadhead Quiver",
+        "Gem Quiver"
+      ]
+    },
+    {
+      "id": "base:belt",
+      "name": "Cinto",
+      "itemClass": "belt",
+      "maxPrefixes": 2,
+      "maxSuffixes": 2,
+      "baseNames": [
+        "Heavy Belt",
+        "Vanguard Belt",
+        "Headhunter Belt"
+      ]
+    },
+    {
+      "id": "base:ring",
+      "name": "Anel",
+      "itemClass": "ring",
+      "maxPrefixes": 2,
+      "maxSuffixes": 2,
+      "baseNames": [
+        "Iron Ring",
+        "Sapphire Ring",
+        "Gold Ring"
+      ]
+    },
+    {
+      "id": "base:amulet",
+      "name": "Amuleto",
+      "itemClass": "amulet",
+      "maxPrefixes": 2,
+      "maxSuffixes": 2,
+      "baseNames": [
+        "Iron Amulet",
+        "Jade Amulet",
+        "Blue Pearl Amulet"
+      ]
+    },
+    {
+      "id": "base:jewel",
+      "name": "Joia",
+      "itemClass": "jewel",
+      "maxPrefixes": 2,
+      "maxSuffixes": 2,
+      "baseNames": [
+        "Cobalt Jewel",
+        "Viridian Jewel",
+        "Crimson Jewel"
+      ]
+    },
+    {
+      "id": "base:other",
+      "name": "Outro",
+      "itemClass": "other",
+      "maxPrefixes": 2,
+      "maxSuffixes": 2,
+      "baseNames": [
+        "Lesser Jewell",
+        "Time-Lost Relic",
+        "Ancient Corpse"
+      ]
+    }
+  ],
+  "currencies": [
+    {
+      "id": "currency:regal-orb",
+      "name": "Regal Orb",
+      "kind": "random-add",
+      "appliesToEmptySlot": true,
+      "overwritesExisting": false,
+      "costInExalted": 0.25,
+      "slotFilter": [
+        "prefix",
+        "suffix"
+      ],
+      "improvesTier": false,
+      "removesPerUse": 0,
+      "description": "Adiciona um modificador aleatorio em um slot VAZIO. Nunca remove nada."
+    },
+    {
+      "id": "currency:orb-of-alchemy",
+      "name": "Orb of Alchemy",
+      "kind": "random-affix",
+      "appliesToEmptySlot": true,
+      "overwritesExisting": true,
+      "costInExalted": 0.1,
+      "slotFilter": [
+        "prefix",
+        "suffix"
+      ],
+      "improvesTier": false,
+      "removesPerUse": 0,
+      "description": "Rola um modificador aleatorio em qualquer slot. Pode DESTRUIR um mod existente."
+    },
+    {
+      "id": "currency:chaos-orb",
+      "name": "Chaos Orb",
+      "kind": "random-affix",
+      "appliesToEmptySlot": true,
+      "overwritesExisting": true,
+      "costInExalted": 0.5,
+      "slotFilter": [
+        "prefix",
+        "suffix"
+      ],
+      "improvesTier": false,
+      "removesPerUse": 0,
+      "description": "Rola um modificador aleatorio em qualquer slot. Mesma chance que Alchemy."
+    },
+    {
+      "id": "currency:orb-of-annulment",
+      "name": "Orb of Annulment",
+      "kind": "remove",
+      "appliesToEmptySlot": false,
+      "overwritesExisting": false,
+      "costInExalted": 1.5,
+      "slotFilter": [
+        "prefix",
+        "suffix"
+      ],
+      "improvesTier": false,
+      "removesPerUse": 1,
+      "description": "Remove um modificador aleatorio (craftado ou implicito). Alto risco de brick."
+    },
+    {
+      "id": "currency:orb-of-friction",
+      "name": "Orb of Friction",
+      "kind": "reroll",
+      "appliesToEmptySlot": true,
+      "overwritesExisting": true,
+      "costInExalted": 0.35,
+      "slotFilter": [
+        "prefix",
+        "suffix"
+      ],
+      "improvesTier": false,
+      "removesPerUse": 0,
+      "description": "Remove um modificador e adiciona outro. Barato, mas so com tiers baixos."
+    },
+    {
+      "id": "currency:exalted-orb",
+      "name": "Exalted Orb",
+      "kind": "random-affix",
+      "appliesToEmptySlot": true,
+      "overwritesExisting": true,
+      "costInExalted": 10,
+      "slotFilter": [
+        "prefix",
+        "suffix"
+      ],
+      "improvesTier": false,
+      "removesPerUse": 0,
+      "description": "Rola um modificador aleatorio com peso maior para tiers altos."
+    },
+    {
+      "id": "currency:orb-of-transmutation",
+      "name": "Orb of Transmutation",
+      "kind": "random-affix",
+      "appliesToEmptySlot": true,
+      "overwritesExisting": false,
+      "costInExalted": 0.02,
+      "slotFilter": [
+        "prefix",
+        "suffix"
+      ],
+      "improvesTier": false,
+      "removesPerUse": 0,
+      "description": "Adiciona mod em item normal. Barata, mas so tier 1."
+    },
+    {
+      "id": "currency:orb-of-augmentation",
+      "name": "Orb of Augmentation",
+      "kind": "random-affix",
+      "appliesToEmptySlot": true,
+      "overwritesExisting": false,
+      "costInExalted": 0.05,
+      "slotFilter": [
+        "prefix",
+        "suffix"
+      ],
+      "improvesTier": false,
+      "removesPerUse": 0,
+      "description": "Adiciona mod em item magico, sempre tier 1."
+    },
+    {
+      "id": "currency:exalted-orb-awakened-",
+      "name": "Exalted Orb (Awakened)",
+      "kind": "random-affix",
+      "appliesToEmptySlot": true,
+      "overwritesExisting": true,
+      "costInExalted": 45,
+      "slotFilter": [
+        "prefix",
+        "suffix"
+      ],
+      "improvesTier": true,
+      "removesPerUse": 0,
+      "description": "Blinda o prefix (ou suffix) atual e rola um novo tier elevado."
+    },
+    {
+      "id": "currency:tainted-chaos-orb",
+      "name": "Tainted Chaos Orb",
+      "kind": "random-affix",
+      "appliesToEmptySlot": true,
+      "overwritesExisting": true,
+      "costInExalted": 2.5,
+      "slotFilter": [
+        "prefix",
+        "suffix"
+      ],
+      "improvesTier": false,
+      "removesPerUse": 0,
+      "description": "Rola qualquer modificador, inclusive de ascension. Melhor cobertura."
+    }
+  ]
+}

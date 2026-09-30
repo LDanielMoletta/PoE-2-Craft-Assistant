@@ -1,0 +1,78 @@
+appId: com.poe2craftassistant.app
+productName: PoE2 Craft Assistant
+copyright: PoE2 Craft Assistant
+
+directories:
+  output: dist-build
+  buildResources: build
+
+# `main` aponta para electron/main.cjs, que resolve a UI em dist/ui. O `dist/`
+# inteiro entra porque o app tambem pode ser executado como CLI Node a partir de
+# dist/index.js; electron/ e o codigo do processo principal, e package.json fica
+# junto porque e' dele que vem o campo `main`.
+files:
+  - package.json
+  - electron/**/*
+  - dist/**/*
+  - '!**/*.map'
+  - '!**/*.ts'
+  - '!**/node_modules/*/{test,tests,__tests__,example,examples,doc,docs}/**'
+  - '!**/node_modules/*/*.{md,markdown,flow,ts,map}'
+
+# A base de mods versionada e' dado estatico de referencia: fica ao lado do
+# executavel para o usuario inspecionar e editar a mao. A copia que o app
+# realmente usa e' o objeto embutido em dist/ui (via modsDbSnapshot) e, depois da
+# primeira revalidacao, poe2_mods_db.json em app.getPath('userData').
+extraResources:
+  - from: src/data/poe2_mods_db.json
+    to: data/poe2_mods_db.json
+
+asar: true
+# Modulo nativo nao pode ficar dentro do asar: o carregamento usa a .node real do
+# disco. Vale para uiohook-napi e para qualquer outro addon compilado.
+asarUnpack:
+  - '**/node_modules/uiohook-napi/**'
+  - '**/*.node'
+
+# `npmRebuild` roda electron-rebuild contra a versao do Electron declarada em
+# devDependencies, que e o que compila uiohook-napi com a ABI certa. Sem isso um
+# addon instalado para o Node do sistema carrega e falha com
+# NODE_MODULE_VERSION no primeiro uso.
+npmRebuild: true
+buildDependenciesFromSource: false
+nodeGypRebuild: false
+
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+    - target: nsis
+      arch:
+        - x64
+  # Sem .ico no repositorio, o electron-builder usa o icone padrao do Electron.
+  # Adicionar build/icon.ico (256x256) remove o fallback.
+  artifactName: ${productName}-${version}-${arch}-${target}.${ext}
+
+portable:
+  artifactName: ${productName}-${version}-portable.${ext}
+
+nsis:
+  # Assistido: o overlay nao tem janela de instalacao propria, e um wizard
+  # permite escolher o diretorio, o que importa para quem roda de um SSD
+  # externo junto com o jogo.
+  oneClick: false
+  perMachine: false
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: ${productName}
+  # Um .exe por vez no diretorio de release: o uninstaller do NSIS e' uninstall
+  # .exe e colide com o nome do artefato padrao.
+  artifactName: ${productName}-${version}-setup.${ext}
+  deleteAppDataOnUninstall: false
+  installerLanguages:
+    - pt_BR
+    - en_US
+  language: '1033'

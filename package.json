@@ -1,0 +1,66 @@
+{
+  "name": "poe2-craft-assistant",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Overlay assistant that computes the optimal currency-orb craft path for Path of Exile 2 items.",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "dev:gui": "vite",
+    "dev:electron": "electron .",
+    "dev:overlay": "concurrently -k \"vite\" \"wait-on tcp:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
+    "dev:mock": "concurrently -k -n app,mock \"pnpm dev:overlay\" \"wait-on tcp:5173 && tsx src/dev/mockGameSimulator.ts\"",
+    "build": "tsc -p tsconfig.build.json && vite build",
+    "build:node": "tsc -p tsconfig.build.json",
+    "build:win": "pnpm build && electron-builder --win",
+    "release": "pnpm build && electron-builder --win",
+    "start": "node dist/index.js",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "rebuild": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^2.0.131",
+    "ai": "^5.0.0",
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "robotjs": "^0.6.0",
+    "zod": "^3.24.1"
+  },
+  "peerDependencies": {
+    "electron": ">=28"
+  },
+  "peerDependenciesMeta": {
+    "electron": { "optional": true }
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^22.10.5",
+    "@vitejs/plugin-react": "^6.1.1",
+    "autoprefixer": "^10.6.1",
+    "concurrently": "^9.1.0",
+    "cross-env": "^7.0.3",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "electron": "^44.4.5",
+    "electron-builder": "^26.0.12",
+    "jsdom": "^30.1.1",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^8.3.1",
+    "vitest": "^2.1.9",
+    "wait-on": "^8.0.1"
+  },
+
+  "engines": {
+    "node": ">=20"
+  }
+}

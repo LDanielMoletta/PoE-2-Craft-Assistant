@@ -1,0 +1,10 @@
+allowBuilds:
+  esbuild: true
+  # Precisa compilar a .node contra a ABI do Node; sem o build script o modulo
+  # carrega e falha com NODE_MODULE_VERSION na primeira captura.
+  uiohook-napi: true
+  #electron-builder so usa isto no target `msi`, que este projeto nao empacota
+  # (portable + nsis). Deixar de buildar mantem `pnpm install` sem toolchain de
+  # MSI em maquinas que so instalam o app.
+  electron-winstaller: false
+  robotjs: true
