@@ -114,7 +114,7 @@ export function OverlayWindow(props: OverlayWindowProps): ReactNode {
   if (tab === 'settings') {
     return (
       <div
-        className="pointer-events-auto flex h-full flex-col overflow-hidden rounded-lg border border-slate-700/80 shadow-2xl backdrop-blur"
+        className="pointer-events-auto flex h-full flex-col overflow-hidden rounded-lg border border-slate-700/80 bg-slate-950 shadow-2xl"
         style={{ opacity, fontSize: `${16 * scale}px` }}
       >
         <div className="top-drag-region">
@@ -138,7 +138,7 @@ export function OverlayWindow(props: OverlayWindowProps): ReactNode {
   if (tab === 'feedback') {
     return (
       <div
-        className="pointer-events-auto flex h-full flex-col overflow-hidden rounded-lg border border-slate-700/80 shadow-2xl backdrop-blur"
+        className="pointer-events-auto flex h-full flex-col overflow-hidden rounded-lg border border-slate-700/80 bg-slate-950 shadow-2xl"
         style={{ opacity, fontSize: `${16 * scale}px` }}
       >
         <div className="top-drag-region">
@@ -157,7 +157,7 @@ export function OverlayWindow(props: OverlayWindowProps): ReactNode {
 
   return (
     <div
-      className="pointer-events-auto flex h-full flex-col overflow-hidden rounded-lg border border-slate-700/80 bg-slate-950/95 shadow-2xl"
+      className="pointer-events-auto flex h-full flex-col overflow-hidden rounded-lg border border-slate-700/80 bg-slate-950 shadow-2xl"
       style={{ opacity, fontSize: `${16 * scale}px` }}
     >
       {state.item !== null && <ItemHeader item={state.item} />}

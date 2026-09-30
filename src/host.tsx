@@ -32,7 +32,7 @@ import { OverlayWindow, type OverlayState } from './ui/OverlayWindow.js';
 import type { ConfigPatch, KeyboardTapSource } from './ui/SettingsModal.js';
 import type { FeedbackDiagnostics, FeedbackSubmission, FeedbackResult, FeedbackDeliveryResult, FeedbackDraft } from './feedback/feedbackReport.js';
 import { buildFeedbackPayload, describeDelivery } from './feedback/feedbackReport.js';
-import { MOCK_ITEMS } from './dev/mockGameSimulator.js';
+import { electronBridge } from './lib/electronBridge.js';
 import { createRendererLogger, type RendererHostBridge } from './logger/rendererLogger.js';
 
 /** Preco de um mod em exalted orbs, para a advertencia de hotkey. */
@@ -171,10 +171,7 @@ export function OverlayHost(): ReactNode {
    * a assinatura nao existe e o overlay continua no `HotkeyManager` simulado.
    */
   useEffect(() => {
-    const api = window.overlayHost;
-    if (api === undefined) return;
-
-    return api.onItemCaptured((payload) => {
+    return electronBridge.onItemCaptured((payload) => {
       const parsed = parseItemText(payload.text);
       applyCapturedItem(parsed.items[0] ?? null, parsed.warnings);
     });
@@ -287,11 +284,7 @@ export function OverlayHost(): ReactNode {
   }, []);
 
   const readLog = useCallback(async (): Promise<string> => {
-    try {
-      return await window.overlayHost?.readLog() ?? '';
-    } catch {
-      return '';
-    }
+    return electronBridge.readLog();
   }, []);
 
   const sendFeedback = useCallback(async (submission: FeedbackSubmission): Promise<FeedbackResult> => {
@@ -317,11 +310,7 @@ export function OverlayHost(): ReactNode {
         },
       );
 
-      const result: FeedbackDeliveryResult = await window.overlayHost?.sendFeedback(payload) ?? {
-        channel: 'none',
-        ok: false,
-        reason: 'overlayHost.sendFeedback indisponível',
-      };
+      const result: FeedbackDeliveryResult = await electronBridge.sendFeedback(payload);
 
       if (!result.ok) {
         return { ok: false, message: describeDelivery(result) };
@@ -347,7 +336,7 @@ export function OverlayHost(): ReactNode {
   // Logger do renderer com bridge para o main (writeLog via IPC).
   useEffect(() => {
     const bridge: RendererHostBridge = {
-      writeLog: (line) => window.overlayHost?.writeLog(line),
+      writeLog: (line) => electronBridge.writeLog(line),
     };
     const { installGlobalHandlers, uninstallGlobalHandlers } = createRendererLogger({
       host: bridge,
@@ -366,34 +355,37 @@ export function OverlayHost(): ReactNode {
     };
   }, []);
 
-  // Dev: F8 injeta item mock via IPC (apenas em dev)
+  // Dev: F8 le o clipboard atual e abre o overlay com o item parseado.
   useEffect(() => {
-    if (process.env.NODE_ENV === 'production') return;
+    if (!import.meta.env.DEV) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'F8' && MOCK_ITEMS.length > 0) {
-        const randomIndex = Math.floor(Math.random() * MOCK_ITEMS.length);
-        const item = MOCK_ITEMS[randomIndex];
-        if (item) {
-          window.overlayHost?.devInjectItem(item.text);
+      if (e.key !== 'F8' || e.repeat) return;
+      e.preventDefault();
+      void (async () => {
+        try {
+          const clipboard = await electronBridge.readClipboard();
+          const parsed = parseItemText(clipboard.text);
+          applyCapturedItem(parsed.items[0] ?? null, parsed.warnings);
+          electronBridge.show();
+        } catch (thrown) {
+          setError(thrown instanceof Error ? thrown.message : String(thrown));
         }
-      }
+      })();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [applyCapturedItem]);
 
   // Escuta item:parsed do main (dev IPC ou hotkey real)
   useEffect(() => {
-    const api = window.overlayHost;
-    if (api === undefined) return;
-    return api.onItemParsed((payload) => {
+    return electronBridge.onItemParsed((payload) => {
       const parsed = parseItemText(payload.text);
       applyCapturedItem(parsed.items[0] ?? null, parsed.warnings);
     });
   }, [applyCapturedItem]);
 
   const handleClose = useCallback(() => {
-    window.overlayHost?.hide();
+    electronBridge.hide();
   }, []);
 
   const handleSetHotkey = useCallback(
@@ -483,12 +475,10 @@ export function OverlayHost(): ReactNode {
  * quando o usuario limpa o campo ou escolhe uma combinacao invalida.
  */
 function pushGlobalHotkey(sequence: string | null): void {
-  const api = window.overlayHost;
-  if (api === undefined) return;
   const accelerator = sequence === null ? null : toElectronAccelerator(sequence);
   // Sem canal de erro no overlay: o `hotkey:status` no painel de Ajustes e'
   // onde o usuario ve que o SO recusou a combinacao.
-  void api.registerGlobalHotkey(accelerator).catch(() => {});
+  void electronBridge.registerGlobalHotkey(accelerator);
 }
 
 /**
@@ -496,13 +486,10 @@ function pushGlobalHotkey(sequence: string | null): void {
  * renderer roda com `sandbox: true`. No browser de dev cai no padrao em disco.
  */
 function createConfigManager(): ConfigManager {
-  const api = window.overlayHost;
-  if (api === undefined) return new ConfigManager();
-
   return new ConfigManager({
     storage: new IpcConfigStorage({
-      read: () => api.readConfig(),
-      write: (contents) => api.writeConfig(contents),
+      read: () => electronBridge.readConfig(),
+      write: (contents) => electronBridge.writeConfig(contents),
     }),
   });
 }
@@ -537,21 +524,7 @@ function toTapSource(source: IKeyboardSource, status: BackendStatus): KeyboardTa
  */
 function createHostClipboard(): IClipboardReader {
   return {
-    async read() {
-      const native = window.overlayHost?.readClipboard();
-      if (native !== undefined) {
-        const snapshot = await native;
-        return { text: snapshot.text, capturedAt: snapshot.capturedAt };
-      }
-      if (typeof navigator !== 'undefined' && 'clipboard' in navigator) {
-        try {
-          return { text: await navigator.clipboard.readText(), capturedAt: Date.now() };
-        } catch {
-          return { text: '', capturedAt: Date.now() };
-        }
-      }
-      return { text: '', capturedAt: Date.now() };
-    },
+    read: () => electronBridge.readClipboard(),
   };
 }
 

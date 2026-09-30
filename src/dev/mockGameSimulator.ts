@@ -1,16 +1,16 @@
+import { writeFileSync } from 'node:fs';
 import process from 'node:process';
-import readline from 'node:readline';
 
 /**
  * Simulador de jogo para teste visual do overlay.
  *
- * O simulador envia o texto do item ao servidor HTTP de desenvolvimento do
- * Electron, que atualiza o clipboard e encaminha o texto ao renderer.
+ * O simulador grava o texto do item em `dev-item.tmp`; o processo Electron
+ * observa o arquivo, atualiza o clipboard e encaminha o texto ao renderer.
  *
  * Uso:
- *   pnpm dev:mock                                  # loop com todos os itens
- *   pnpm dev:mock -- --once --index=1              # so o Peitoral Raro
- *   pnpm dev:mock -- --dry-run                    # so imprime, sem GUI
+ *   pnpm dev:mock                                  # ciclo automatico de itens
+ *   pnpm dev:mock -- --once --index=1              # grava so o Peitoral Raro
+ *   pnpm dev:mock -- --dry-run                     # so imprime, sem GUI
  */
 
 export interface MockItem {
@@ -116,77 +116,30 @@ export const MOCK_ITEMS: readonly MockItem[] = [
   },
 ];
 
-/**
- * Faz POST HTTP para o servidor dev do Electron (porta 5174).
- * Payload: { rawItem: string }. Sucesso: { success: true }.
- */
-export async function injectItemWithRetry(text: string): Promise<boolean> {
-  console.log('[MOCK] Conectando ao Electron na porta 5174...');
-  for (let attempt = 0; attempt < 10; attempt += 1) {
-    try {
-      const response = await fetch('http://localhost:5174/inject-item', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rawItem: text }),
-      });
-      if (response.status === 200) {
-        const data: unknown = await response.json();
-        if (typeof data === 'object' && data !== null && 'success' in data && data.success === true) {
-          console.log('[MOCK] Item enviado com sucesso!');
-          return true;
-        }
-      }
-    } catch {
-      // O Electron pode ainda estar iniciando; a proxima tentativa e' limitada.
-    }
-    if (attempt < 9) await sleep(500);
-  }
-  return false;
-}
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function runMockGame(options: MockGameOptions): Promise<void> {
   console.log(`[mock] ${MOCK_ITEMS.length} itens`);
   if (options.dryRun) console.log('[mock] dry-run: nada sera enviado ao SO');
 
+  await sleep(4000);
   let index = options.startIndex;
   for (let round = 0; ; round += 1) {
     const item = MOCK_ITEMS[index % MOCK_ITEMS.length];
     if (item === undefined) break;
 
     console.log(`[mock] ${String(round + 1).padStart(3, ' ')} ${item.label}`);
-    if (!process.argv.includes('--no-wait')) {
-      await waitForEnter('[mock] Pressione ENTER para enviar este item (ou Ctrl+C para sair)... ');
-    }
     if (options.dryRun) {
       console.log('dry-run: nao enviados ao SO');
     } else {
-      const ok = await injectItemWithRetry(item.text);
-      if (!ok) {
-        console.log('[MOCK] Falha ao conectar ao Electron apos 10 tentativas.');
-      }
+      writeFileSync('dev-item.tmp', item.text, 'utf8');
+      console.log('[MOCK] Item gravado no arquivo dev-item.tmp!');
     }
 
     index += 1;
     if (!options.loop) return;
-
-    if (process.argv.includes('--no-wait')) {
-      await sleep(options.intervalMs);
-    }
+    await sleep(options.intervalMs);
   }
-}
-
-/** Aguarda o usuario pressionar ENTER no terminal usando readline (compativel com pipes/concurrently). */
-function waitForEnter(promptText: string = '[mock] Pressione ENTER para o proximo item (ou Ctrl+C para sair)... '): Promise<void> {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  return new Promise((resolve) => {
-    rl.question(promptText, () => {
-      rl.close();
-      resolve();
-    });
-  });
 }
 
 function parseArgs(argv: readonly string[]): MockGameOptions {
@@ -208,16 +161,12 @@ function parseArgs(argv: readonly string[]): MockGameOptions {
   }
 
   return {
-    intervalMs: number('interval', 4000),
+    intervalMs: number('interval', 5000),
     startIndex,
     loop: !argv.includes('--once'),
     dryRun: argv.includes('--dry-run'),
   };
 }
-
-const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
-
-/** Aguarda o usuario pressionar ENTER no terminal usando readline (compativel com pipes/concurrently). */
 
 const invokedDirectly = process.argv[1] !== undefined && process.argv[1].includes('mockGameSimulator');
 

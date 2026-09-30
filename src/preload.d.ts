@@ -47,11 +47,6 @@ export interface OverlayHostApi {
    * apontar o envio para um host que a aplicacao nao configurou.
    */
   sendFeedback(payload: FeedbackPayload): Promise<FeedbackDeliveryResult>;
-  /**
-   * Injeta um item de teste via IPC (apenas em modo dev).
-    * Encaminha o texto para o processo principal.
-   */
-  devInjectItem(rawText: string): Promise<{ ok: boolean; error?: string }>;
   /** Escuta o item parseado vindo do main (dev ou hotkey real). */
   onItemParsed(handler: (payload: { text: string; capturedAt: number }) => void): () => void;
 }
@@ -77,6 +72,7 @@ export interface GlobalHotkeyStatus {
 
 declare global {
   interface Window {
+    electron?: OverlayHostApi;
     overlayHost?: OverlayHostApi;
   }
 }

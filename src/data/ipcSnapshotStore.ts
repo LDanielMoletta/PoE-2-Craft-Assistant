@@ -1,4 +1,5 @@
 import type { HydrationSnapshotStore, ModsDatabaseInput } from '../scraper/dataHydration.js';
+import { electronBridge, isElectronAvailable } from '../lib/electronBridge.js';
 
 import { createBundledSnapshotStore } from './modsDbSnapshot.js';
 
@@ -18,16 +19,9 @@ import { createBundledSnapshotStore } from './modsDbSnapshot.js';
  */
 export function createRendererSnapshotStore(): HydrationSnapshotStore {
   const bundled = createBundledSnapshotStore();
-  const host = typeof window === 'undefined' ? undefined : window.overlayHost;
-  if (
-    host === undefined ||
-    typeof host.readDataSnapshot !== 'function' ||
-    typeof host.writeDataSnapshot !== 'function'
-  ) {
+  if (!isElectronAvailable()) {
     return bundled;
   }
-
-  const { readDataSnapshot, writeDataSnapshot } = host;
   let session: unknown | null = null;
   let loaded: Promise<unknown | null> | null = null;
 
@@ -38,7 +32,7 @@ export function createRendererSnapshotStore(): HydrationSnapshotStore {
       // corrompido, e a hidratacao cai para a camada de baixo. A leitura e o
       // parse ficam no mesmo try porque o `JSON.parse` falha depois do IPC ter
       // resolvido com sucesso.
-      loaded ??= readDataSnapshot()
+      loaded ??= electronBridge.readDataSnapshot()
         .then((contents) =>
           contents === null || contents === undefined ? null : (JSON.parse(contents) as unknown),
         )
@@ -47,7 +41,7 @@ export function createRendererSnapshotStore(): HydrationSnapshotStore {
     },
     async write(snapshot: ModsDatabaseInput) {
       session = snapshot;
-      await writeDataSnapshot(JSON.stringify(snapshot));
+      await electronBridge.writeDataSnapshot(JSON.stringify(snapshot));
     },
   };
 }

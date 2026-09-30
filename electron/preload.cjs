@@ -11,7 +11,7 @@ const { contextBridge, ipcRenderer } = require('electron');
  * payload cru chega aqui e o parse acontece do lado do renderer, que tem o
  * `ItemSchema`.
  */
-contextBridge.exposeInMainWorld('overlayHost', {
+const electronApi = {
   hide: () => ipcRenderer.invoke('overlay:hide'),
   show: () => ipcRenderer.invoke('overlay:show'),
   close: () => ipcRenderer.invoke('overlay:close'),
@@ -65,12 +65,6 @@ contextBridge.exposeInMainWorld('overlayHost', {
    */
   sendFeedback: (payload) => ipcRenderer.invoke('app:send-feedback', payload),
 
-  /**
-   * Injeta um item de teste via IPC (apenas em modo dev).
-    * Encaminha o texto para o processo principal.
-   */
-  devInjectItem: (rawText) => ipcRenderer.invoke('dev:inject-item', rawText),
-
   /** Escuta o item parseado vindo do main (dev ou hotkey real). */
   onItemParsed: (handler) => {
     if (typeof handler !== 'function') return () => {};
@@ -80,4 +74,7 @@ contextBridge.exposeInMainWorld('overlayHost', {
       ipcRenderer.removeListener('item:parsed', listener);
     };
   },
-});
+};
+
+contextBridge.exposeInMainWorld('overlayHost', electronApi);
+contextBridge.exposeInMainWorld('electron', electronApi);

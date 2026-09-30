@@ -1,8 +1,7 @@
 'use strict';
 
 const { app, BrowserWindow, clipboard, globalShortcut, ipcMain, screen, shell, Tray, Menu, nativeImage } = require('electron');
-const http = require('node:http');
-const { mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } = require('node:fs');
+const { mkdirSync, readFileSync, renameSync, unlinkSync, watch, writeFileSync } = require('node:fs');
 const path = require('node:path');
 const { execSync } = require('node:child_process');
 
@@ -76,6 +75,8 @@ let mainHotkeys = null;
 
 /** @type {{ path: string, tail: (limit: number) => string } | null} */
 let currentLog = null;
+let devItemWatcher = null;
+let devItemReadTimer = null;
 
 function createHotkeyManager() {
   return createMainHotkeyManager({
@@ -354,38 +355,6 @@ function registerIpc() {
     };
   });
 
-  // Handler de desenvolvimento: injeta item direto via IPC sem depender de teclado do SO
-  ipcMain.handle('dev:inject-item', async (_event, rawText) => {
-    if (typeof rawText !== 'string' || rawText.trim() === '') {
-      return { ok: false, error: 'Texto do item vazio' };
-    }
-    
-    console.log('[MAIN DEV] Item recebido via IPC. Processando...');
-    logMain('info', '[MAIN DEV] Item recebido via IPC. Processando...');
-    
-    // 1. Copia para o clipboard do sistema
-    clipboard.writeText(rawText);
-    logMain('info', '[MAIN DEV] Texto copiado para clipboard', { length: rawText.length });
-    
-    // 2. Le o clipboard (simula o que o hotkey faria)
-    const text = clipboard.readText();
-    logMain('info', '[MAIN DEV] Clipboard lido', { length: text.length });
-    
-    // 3. Envia para o renderer via IPC item:parsed
-    if (overlayWindow) {
-      overlayWindow.show();
-      overlayWindow.restore();
-      overlayWindow.focus();
-      overlayWindow.setAlwaysOnTop(true, 'screen-saver');
-      
-      // Envia o texto bruto para o renderer fazer o parse
-      overlayWindow.webContents.send('item:parsed', { text, capturedAt: Date.now() });
-      logMain('info', '[MAIN DEV] Enviado item:parsed para renderer');
-    }
-    
-    return { ok: true };
-  });
-
   // O renderer le o clipboard pelo main: no Windows isso exige subprocesso.
   ipcMain.handle('clipboard:read', () => {
     const text = clipboard.readText();
@@ -462,58 +431,35 @@ function registerIpc() {
   });
 }
 
-function startDevInjectionServer() {
-  const devServer = http.createServer((req, res) => {
-    if (req.method !== 'POST' || req.url !== '/inject-item') {
-      res.writeHead(404);
-      res.end();
-      return;
-    }
+function startDevItemWatcher() {
+  const projectRoot = path.join(__dirname, '..');
+  const itemPath = path.join(projectRoot, 'dev-item.tmp');
+  devItemWatcher = watch(projectRoot, (_eventType, filename) => {
+    if (filename?.toString() !== 'dev-item.tmp') return;
 
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk;
-      if (body.length > 1024 * 1024) {
-        res.writeHead(413, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: false, error: 'Corpo muito grande' }));
-        req.destroy();
-      }
-    });
-    req.on('end', () => {
-      if (res.writableEnded) return;
-      let rawItem;
+    if (devItemReadTimer !== null) clearTimeout(devItemReadTimer);
+    devItemReadTimer = setTimeout(() => {
+      devItemReadTimer = null;
       try {
-        ({ rawItem } = JSON.parse(body));
-      } catch {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: false, error: 'JSON invalido' }));
-        return;
-      }
+        const rawItem = readFileSync(itemPath, 'utf8');
+        if (rawItem.trim() === '') return;
 
-      if (typeof rawItem !== 'string' || rawItem.trim() === '') {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: false, error: 'Texto vazio' }));
-        return;
+        clipboard.writeText(rawItem);
+        if (overlayWindow) {
+          overlayWindow.webContents.send('item:parsed', { text: rawItem, capturedAt: Date.now() });
+          overlayWindow.show();
+          overlayWindow.restore();
+          overlayWindow.focus();
+          overlayWindow.setAlwaysOnTop(true, 'screen-saver');
+          console.log('[MAIN DEV] Item detectado via dev-item.tmp! Janela exibida.');
+        }
+      } catch (error) {
+        if (error?.code !== 'ENOENT') {
+          logMain('error', '[MAIN DEV] Falha ao ler dev-item.tmp', { error: String(error) });
+        }
       }
-
-      clipboard.writeText(rawItem);
-      if (overlayWindow) {
-        overlayWindow.show();
-        overlayWindow.restore();
-        overlayWindow.focus();
-        overlayWindow.setAlwaysOnTop(true, 'screen-saver');
-        overlayWindow.webContents.send('item:parsed', { text: rawItem, capturedAt: Date.now() });
-      }
-
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true }));
-    });
+    }, 75);
   });
-
-  devServer.listen(5174, '127.0.0.1', () => {
-    console.log('[MAIN DEV] HTTP dev server listening on http://127.0.0.1:5174');
-  });
-  return devServer;
 }
 
 /**
@@ -553,9 +499,9 @@ app.whenReady().then(() => {
   // O usuario pode clicar para abrir o overlay ou sair.
   createTray();
 
-  // Servidor HTTP simples para dev/inject-item (apenas em modo dev)
-  if (process.env.VITE_DEV_SERVER_URL || process.env.NODE_ENV !== 'production') {
-    startDevInjectionServer();
+  // Observa o arquivo temporario usado pelo simulador, apenas com o servidor Vite.
+  if (process.env.VITE_DEV_SERVER_URL) {
+    startDevItemWatcher();
   }
 
   app.on('activate', () => {
@@ -566,6 +512,10 @@ app.whenReady().then(() => {
 app.on('will-quit', () => {
   mainHotkeys?.dispose();
   mainHotkeys = null;
+  devItemWatcher?.close();
+  devItemWatcher = null;
+  if (devItemReadTimer !== null) clearTimeout(devItemReadTimer);
+  devItemReadTimer = null;
   logMain('info', 'app encerrando');
 });
 
