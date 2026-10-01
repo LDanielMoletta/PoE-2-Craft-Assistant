@@ -14,52 +14,7 @@
  * `src/overlay/mainHotkeyManager.ts`.
  */
 
-const { clipboard } = require('electron');
-
-/**
- * Envia `Ctrl+C` para o SO antes de ler a area de transferencia.
- * Usa `robotjs` se disponivel, caso contrario cai para PowerShell no Windows.
- * Isso garante que o item sob o cursor seja copiado automaticamente.
- */
-async function sendCtrlC() {
-  // Tenta robotjs primeiro (nativo, mais rapido)
-  try {
-    const robot = require('robotjs');
-    robot.keyTap('c', 'control');
-    // Pequeno delay para o clipboard atualizar
-    await new Promise((r) => setTimeout(r, 80));
-    return;
-  } catch {
-    // robotjs nao instalado ou falhou, tenta PowerShell
-  }
-
-  // Fallback PowerShell no Windows
-  if (process.platform === 'win32') {
-    try {
-      const { execSync } = require('child_process');
-      // SendKeys via COM object (mais confiavel que robotjs em alguns casos)
-      execSync(
-        'powershell -NoProfile -Command "$ws = New-Object -ComObject WScript.Shell; $ws.SendKeys(\'^(c)\'); Start-Sleep -Milliseconds 80"',
-        { stdio: 'ignore', timeout: 2000 }
-      );
-      return;
-    } catch {
-      // PowerShell falhou, segue sem auto-copy
-    }
-  }
-
-  // Linux/macOS: tenta xdotool se disponivel
-  if (process.platform === 'linux') {
-    try {
-      const { execSync } = require('child_process');
-      execSync('xdotool key ctrl+c', { stdio: 'ignore', timeout: 2000 });
-      await new Promise((r) => setTimeout(r, 80));
-      return;
-    } catch {
-      // xdotool nao instalado
-    }
-  }
-}
+const INVALID_ITEM_MESSAGE = 'Nenhum item válido detectado no Clipboard';
 
 /**
  * @param {object} options
@@ -69,6 +24,7 @@ async function sendCtrlC() {
  *           isRegistered(accelerator: string): boolean }} options.backend
  * @param {{ readText(): string }} options.clipboard
  * @param {(payload: { text: string, capturedAt: number, accelerator: string }) => void} options.onCaptured
+ * @param {(message: string) => void} [options.onInvalid]
  * @param {() => boolean} options.isPoE2Focused
  * @param {() => number} [options.now]
  * @param {boolean} [options.verbose]
@@ -77,6 +33,7 @@ function createMainHotkeyManager(options) {
   const backend = options.backend;
   const clipboard = options.clipboard;
   const onCaptured = options.onCaptured;
+  const onInvalid = options.onInvalid ?? ((message) => console.log(`[hotkey:main] ${message}`));
   const isPoE2Focused = options.isPoE2Focused;
   const now = options.now ?? Date.now;
   const verbose = options.verbose ?? false;
@@ -115,17 +72,18 @@ function createMainHotkeyManager(options) {
 
     let text = '';
     try {
-      // Auto-captura: envia Ctrl+C para o jogo copiar o item antes de ler o clipboard
-      sendCtrlC().catch((err) => {
-        if (verbose) console.warn(`[hotkey:main] sendCtrlC falhou: ${err}`);
-      });
       text = clipboard.readText();
     } catch (error) {
-      // O jogador acabou de apertar a tecla e precisa de alguma resposta na
-      // tela; texto vazio e melhor do que engasgar o atalho.
       if (verbose) {
         console.warn(`[hotkey:main] clipboard: ${error instanceof Error ? error.message : String(error)}`);
       }
+      onInvalid(INVALID_ITEM_MESSAGE);
+      return;
+    }
+
+    if (!/Rarity:|Item Class:/i.test(text)) {
+      onInvalid(INVALID_ITEM_MESSAGE);
+      return;
     }
 
     if (verbose) console.log(`[hotkey:main] ${bound} -> ${text.length} chars`);

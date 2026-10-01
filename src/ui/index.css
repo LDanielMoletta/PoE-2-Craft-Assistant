@@ -11,8 +11,7 @@
   }
 
   body {
-    /* Fundo transparente: o overlay flutua sobre o jogo. */
-    background: transparent;
+    background: #121212;
     color: theme('colors.slate.100');
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     overflow: hidden;

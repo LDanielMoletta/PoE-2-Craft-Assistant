@@ -48,7 +48,7 @@ describe('ConfigManager', () => {
       const manager = fileManager();
       const config = await manager.load();
 
-      expect(config.hotkeys.triggerOverlay).toBe('alt+q');
+      expect(config.hotkeys.triggerOverlay).toBe('alt+x');
       expect(config.hotkeys.quickAnalyze).toBe('ctrl+c');
       expect(config.crafting.defaultBudget).toBe(10);
       expect(config.ui.opacity).toBe(0.95);
@@ -72,6 +72,13 @@ describe('ConfigManager', () => {
       expect(config.hotkeys.triggerOverlay).toBe('alt+shift+e');
       expect(config.hotkeys.quickAnalyze).toBe('ctrl+c');
     });
+
+    it('migra o atalho global antigo para Alt+X', async () => {
+      write({ hotkeys: { triggerOverlay: 'alt+q' } });
+      const config = await fileManager().load();
+
+      expect(config.hotkeys.triggerOverlay).toBe('alt+x');
+    });
   });
 
   describe('leitura defensiva', () => {
@@ -94,7 +101,7 @@ describe('ConfigManager', () => {
 
       expect(config.crafting.defaultBudget).toBe(42);
       expect(config.crafting.budgetCurrency).toBe('exalted');
-      expect(config.hotkeys.triggerOverlay).toBe('alt+q');
+      expect(config.hotkeys.triggerOverlay).toBe('alt+x');
     });
 
     it('recusa hotkey global invalida e volta para o padrao', async () => {
@@ -105,14 +112,14 @@ describe('ConfigManager', () => {
 
       const config = await manager.load();
 
-      expect(config.hotkeys.triggerOverlay).toBe('alt+q');
+      expect(config.hotkeys.triggerOverlay).toBe('alt+x');
       expect(errors[0]?.scope).toBe('validate');
     });
 
     it('recusa atalho reservado do sistema operacional', async () => {
       write({ hotkeys: { triggerOverlay: 'Ctrl+Alt+Delete' } });
       const config = await fileManager().load();
-      expect(config.hotkeys.triggerOverlay).toBe('alt+q');
+      expect(config.hotkeys.triggerOverlay).toBe('alt+x');
     });
 
     it('mantem Ctrl+C observado mesmo sendo atalho comum', async () => {
@@ -176,7 +183,7 @@ describe('ConfigManager', () => {
 
       expect(result.valid).toBe(false);
       expect(result.code).toBe('no-modifier');
-      expect(manager.getHotkey('triggerOverlay')).toBe('alt+q');
+      expect(manager.getHotkey('triggerOverlay')).toBe('alt+x');
     });
 
     it('recusa conflito com o outro atalho', async () => {
@@ -222,7 +229,7 @@ describe('ConfigManager', () => {
       expect(events).toHaveLength(1);
       expect(events[0]).toMatchObject({
         action: 'triggerOverlay',
-        previous: 'alt+q',
+        previous: 'alt+x',
         next: 'ctrl+j',
         global: true,
       });
@@ -286,7 +293,7 @@ describe('ConfigManager', () => {
       await manager.reset();
 
       expect(events).toEqual([
-        { action: 'triggerOverlay', previous: 'ctrl+j', next: 'alt+q', global: true },
+        { action: 'triggerOverlay', previous: 'ctrl+j', next: 'alt+x', global: true },
       ]);
     });
 
@@ -346,7 +353,7 @@ describe('ConfigManager', () => {
       await first.load();
       await first.setHotkey('triggerOverlay', 'Ctrl+J');
 
-      expect((await new ConfigManager().load()).hotkeys.triggerOverlay).toBe('alt+q');
+      expect((await new ConfigManager().load()).hotkeys.triggerOverlay).toBe('alt+x');
     });
 
     it('o padrao em memoria guarda o que foi gravado', async () => {
@@ -393,7 +400,7 @@ describe('ConfigManager', () => {
 
       const summary = manager.describe();
 
-      expect(summary).toContain('triggerOverlay=Alt+Q(global)');
+      expect(summary).toContain('triggerOverlay=Alt+X(global)');
       expect(summary).toContain('quickAnalyze=Ctrl+C(observado)');
     });
   });

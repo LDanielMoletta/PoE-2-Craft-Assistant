@@ -23,6 +23,7 @@ const cjsModule = requireCjs('../../electron/mainHotkeyManager.cjs') as {
     backend: GlobalShortcutBackend;
     clipboard: { readText(): string };
     onCaptured: (payload: ItemCapturedPayload) => void;
+    onInvalid?: (message: string) => void;
     now: () => number;
     verbose?: boolean;
   }) => {
@@ -90,17 +91,26 @@ function statusOf(manager: Harness): Record<string, unknown> {
 }
 
 const NOW = 1_760_000_000_000;
+const VALID_ITEM = 'Item Class: Wands\nRarity: Rare\nRequirements: Level 20';
 
 function build(make: ManagerFactory, clipboard: { readText(): string }, captured: ItemCapturedPayload[]) {
   const backend = fakeBackend();
-  const manager = make({ backend, clipboard, onCaptured: (p) => captured.push(p), now: () => NOW });
-  return { backend, manager };
+  const invalid: string[] = [];
+  const manager = make({
+    backend,
+    clipboard,
+    onCaptured: (p) => captured.push(p),
+    onInvalid: (message) => invalid.push(message),
+    now: () => NOW,
+  });
+  return { backend, manager, invalid };
 }
 
 type ManagerFactory = (options: {
   backend: GlobalShortcutBackend;
   clipboard: { readText(): string };
   onCaptured: (payload: ItemCapturedPayload) => void;
+  onInvalid?: (message: string) => void;
   now: () => number;
 }) => Harness;
 
@@ -208,19 +218,19 @@ describe.each(implementations)('ciclo de vida do atalho global (%s)', (_name, ma
 
   it('dispara a captura com o texto do clipboard e o acelerador que disparou', () => {
     const captured: ItemCapturedPayload[] = [];
-    const { backend, manager } = build(make, { readText: () => 'item super invocado' }, captured);
+    const { backend, manager } = build(make, { readText: () => VALID_ITEM }, captured);
     manager.bind('Alt+E');
 
     backend.press('Alt+E');
 
     expect(captured).toEqual([
-      { text: 'item super invocado', capturedAt: NOW, accelerator: 'Alt+E' },
+      { text: VALID_ITEM, capturedAt: NOW, accelerator: 'Alt+E' },
     ]);
   });
 
-  it('entrega texto vazio quando o clipboard falha, em vez de engasgar o atalho', () => {
+  it('notifica quando a leitura do clipboard falha', () => {
     const captured: ItemCapturedPayload[] = [];
-    const { backend, manager } = build(
+    const { backend, manager, invalid } = build(
       make,
       {
         readText() {
@@ -233,14 +243,45 @@ describe.each(implementations)('ciclo de vida do atalho global (%s)', (_name, ma
 
     backend.press('Alt+E');
 
-    // O jogador acabou de apertar a tecla: responder com string vazia e o que
-    // deixa a UI dizer "nao ha captura". Nao responder nada seria pior.
-    expect(captured).toEqual([{ text: '', capturedAt: NOW, accelerator: 'Alt+E' }]);
+    expect(captured).toEqual([]);
+    expect(invalid).toEqual(['Nenhum item válido detectado no Clipboard']);
+  });
+
+  it('le o clipboard sem altera-lo quando a hotkey e pressionada', () => {
+    const captured: ItemCapturedPayload[] = [];
+    const calls: string[] = [];
+    const { backend, manager } = build(
+      make,
+      {
+        readText: () => {
+          calls.push('read');
+          return VALID_ITEM;
+        },
+      },
+      captured,
+    );
+    manager.bind('Alt+E');
+
+    backend.press('Alt+E');
+
+    expect(calls).toEqual(['read']);
+    expect(captured).toHaveLength(1);
+  });
+
+  it('notifica quando clipboard nao contem marcadores de item', () => {
+    const captured: ItemCapturedPayload[] = [];
+    const { backend, manager, invalid } = build(make, { readText: () => 'texto sem item' }, captured);
+    manager.bind('Alt+E');
+
+    backend.press('Alt+E');
+
+    expect(captured).toEqual([]);
+    expect(invalid).toEqual(['Nenhum item válido detectado no Clipboard']);
   });
 
   it('cada disparo leva o acelerador atual, mesmo apos um rebind', () => {
     const captured: ItemCapturedPayload[] = [];
-    const { backend, manager } = build(make, { readText: () => 'x' }, captured);
+    const { backend, manager } = build(make, { readText: () => VALID_ITEM }, captured);
     manager.bind('Alt+E');
     manager.bind('Alt+F');
 
@@ -289,7 +330,7 @@ describe.each(implementations)('ciclo de vida do atalho global (%s)', (_name, ma
 
   it('nao registra duas vezes o mesmo acelerador', () => {
     const captured: ItemCapturedPayload[] = [];
-    const { backend, manager } = build(make, { readText: () => 'x' }, captured);
+    const { backend, manager } = build(make, { readText: () => VALID_ITEM }, captured);
 
     manager.bind('Alt+E');
     manager.bind('Alt+E');

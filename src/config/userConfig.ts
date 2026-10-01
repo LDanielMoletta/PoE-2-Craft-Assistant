@@ -43,7 +43,7 @@ export const HotkeySchema = z
   });
 
 const HotkeysSchema = z.object({
-  triggerOverlay: HotkeySchema.default('Alt+Q'),
+  triggerOverlay: HotkeySchema.default('Alt+X'),
   quickAnalyze: HotkeySchema.default('Ctrl+C'),
 });
 
@@ -64,7 +64,7 @@ const UiSchema = z.object({
 /** Configuracao completa do usuario. Todos os campos tem default. */
 export const UserConfigSchema = z.object({
   version: z.literal(CONFIG_VERSION).default(CONFIG_VERSION),
-  hotkeys: HotkeysSchema.default({ triggerOverlay: 'alt+q', quickAnalyze: 'ctrl+c' }),
+  hotkeys: HotkeysSchema.default({ triggerOverlay: 'alt+x', quickAnalyze: 'ctrl+c' }),
   crafting: CraftingSchema.default({}),
   ui: UiSchema.default({}),
 });
@@ -384,9 +384,9 @@ export class ConfigManager {
     if (!trigger.valid) {
       this.#emit('config:error', {
         scope: 'validate',
-        message: `hotkeys.triggerOverlay invalido (${trigger.code}): ${trigger.message}. Voltando para Alt+Q.`,
+        message: `hotkeys.triggerOverlay invalido (${trigger.code}): ${trigger.message}. Voltando para Alt+X.`,
       });
-      hotkeys = { ...hotkeys, triggerOverlay: 'alt+q' };
+      hotkeys = { ...hotkeys, triggerOverlay: 'alt+x' };
     }
 
     const quick = validateHotkey(hotkeys.quickAnalyze, { taken: [hotkeys.triggerOverlay] });
@@ -411,6 +411,10 @@ export class ConfigManager {
         message: `Config invalido; usando defaults. ${message}`,
       });
       return DEFAULT_USER_CONFIG;
+    }
+
+    if (parsed.data.hotkeys.triggerOverlay === 'alt+q') {
+      parsed.data.hotkeys.triggerOverlay = 'alt+x';
     }
 
     if (!this.#validateHotkeys) return parsed.data;

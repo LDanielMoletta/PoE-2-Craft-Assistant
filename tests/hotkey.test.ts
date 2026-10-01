@@ -340,7 +340,7 @@ describe('ConfigManager com HotkeyManager', () => {
 
     // O overlay so troca quando o jogador confirma; ate la o atalho vale.
     await config.setHotkey('quickAnalyze', 'Ctrl+Q');
-    expect(source.tap('alt+q')).toBe(true);
+    expect(source.tap('alt+x')).toBe(true);
     expect(source.tap('ctrl+q')).toBe(false);
   });
 
@@ -361,6 +361,6 @@ describe('ConfigManager com HotkeyManager', () => {
 
     expect(result.valid).toBe(false);
     expect(result.code).toBe('reserved');
-    expect(config.getHotkey('triggerOverlay')).toBe('alt+q');
+    expect(config.getHotkey('triggerOverlay')).toBe('alt+x');
   });
 });

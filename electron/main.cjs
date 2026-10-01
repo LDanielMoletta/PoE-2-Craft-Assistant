@@ -1,7 +1,7 @@
 'use strict';
 
-const { app, BrowserWindow, clipboard, globalShortcut, ipcMain, screen, shell, Tray, Menu, nativeImage, Notification } = require('electron');
-const { mkdirSync, readFileSync, renameSync, unlinkSync, watch, writeFileSync } = require('node:fs');
+const { app, BrowserWindow, clipboard, globalShortcut, ipcMain, screen, shell, Tray, Menu, nativeImage } = require('electron');
+const { mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } = require('node:fs');
 const path = require('node:path');
 const { execFileSync, execSync } = require('node:child_process');
 
@@ -60,29 +60,28 @@ function isPoE2Focused() {
 
 
 /**
- * Processo principal do overlay.
+ * Janela principal do assistente, alternavel entre desktop e overlay.
  *
- *  - `frame: false` + `transparent: true`: a janela nao tem borda nem fundo, e
- *    por isso nao rouba o foco do Path of Exile quando aparece.
- *  - `alwaysOnTop` com `screen-saver`: e' o unico cenario em que o overlay e'
- *    usado, e o jogo esta em tela cheia.
+ *  - O boot e' uma janela desktop opaca, com moldura nativa e sem always-on-top.
+ *  - O modo overlay usa fullscreen e opacidade de janela para preservar o
+ *    estado React sem recriar a BrowserWindow.
  *  - O atalho global vive aqui, e nao no renderer, que fica pausado quando o
  *    jogo esta em foreground exclusivo.
  */
 
-const OVERLAY_WIDTH = 460;
-const OVERLAY_HEIGHT = 720;
+const MAIN_WINDOW_WIDTH = 900;
+const MAIN_WINDOW_HEIGHT = 600;
+const OVERLAY_OPACITY = 0.92;
 
 /** @type {BrowserWindow | null} */
 let overlayWindow = null;
+let overlayMode = false;
 
 /** @type {ReturnType<typeof createMainHotkeyManager> | null} */
 let mainHotkeys = null;
 
 /** @type {{ path: string, tail: (limit: number) => string } | null} */
 let currentLog = null;
-let devItemWatcher = null;
-let devItemReadTimer = null;
 let gameMonitor = null;
 let gameWasDetected = false;
 
@@ -130,18 +129,22 @@ function createHotkeyManager() {
       // Log do clipboard lido
       logMain('info', '[MAIN] Clipboard lido', { length: payload?.text?.length || 0 });
       
-      // Forca visibilidade do overlay acima de jogos em tela cheia.
       console.log('[MAIN] Hotkey disparada! Exibindo overlay...');
-      if (overlayWindow) {
-        overlayWindow.setAlwaysOnTop(true, 'screen-saver');
-        overlayWindow.show();
-        overlayWindow.restore();
-        overlayWindow.focus();
-      }
+      setOverlayMode(true);
       
-      // Envia payload parseado para o renderer via IPC
-      logMain('info', '[MAIN] Enviando payload para renderer via IPC overlay:item-captured');
-      overlayWindow?.webContents.send('overlay:item-captured', payload);
+      // O renderer valida/parseia o texto e monta o item estruturado.
+      logMain('info', '[MAIN] Enviando item para renderer via IPC item:parsed');
+      overlayWindow?.webContents.send('item:parsed', {
+        text: payload.text,
+        capturedAt: payload.capturedAt,
+      });
+    },
+    onInvalid: (message) => {
+      console.log(`[MAIN] ${message}`);
+      if (!overlayWindow || overlayWindow.isDestroyed()) return;
+      if (overlayWindow.isMinimized()) overlayWindow.restore();
+      overlayWindow.show();
+      overlayWindow.webContents.send('window:item-invalid', message);
     },
     verbose: process.env.POE2_DEBUG_HOTKEY === '1',
   });
@@ -156,30 +159,20 @@ function resolveRendererTarget() {
 }
 
 function createOverlayWindow() {
-  const display = screen.getPrimaryDisplay();
-  const { width, height } = display.workAreaSize;
-
   overlayWindow = new BrowserWindow({
-    width: OVERLAY_WIDTH,
-    height: OVERLAY_HEIGHT,
-    x: Math.max(0, width - OVERLAY_WIDTH - 40),
-    y: Math.max(0, Math.round(height / 2 - OVERLAY_HEIGHT / 2)),
-    frame: false,
-    transparent: true,
-    backgroundColor: '#00000000',
-    resizable: false,
-    minimizable: false,
-    maximizable: false,
-    fullscreenable: false,
-    skipTaskbar: true,
-    alwaysOnTop: true,
-    show: false,
-    /**
-     * Focavel de proposito: o atalho global abre o overlay e o jogador precisa
-     * clicar em Ajustes, digitar um atalho e usar os botoes do plano. Com
-     * `focusable: false` o Windows aceita o desenho mas ignora clique e
-     * teclado, e a tela de ajustes fica morta.
-     */
+    width: MAIN_WINDOW_WIDTH,
+    height: MAIN_WINDOW_HEIGHT,
+    center: true,
+    frame: true,
+    transparent: false,
+    backgroundColor: '#121212',
+    resizable: true,
+    minimizable: true,
+    maximizable: true,
+    fullscreenable: true,
+    skipTaskbar: false,
+    alwaysOnTop: false,
+    show: true,
     focusable: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
@@ -189,10 +182,6 @@ function createOverlayWindow() {
     },
   });
 
-  // "screen-saver" mantem o overlay acima de outros em tela cheia.
-  overlayWindow.setAlwaysOnTop(true, 'screen-saver');
-  overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-
   void overlayWindow.loadURL(resolveRendererTarget());
 
   // Escape resolve no main e nao no renderer: se a UI travou ou nem carregou,
@@ -200,20 +189,20 @@ function createOverlayWindow() {
   overlayWindow.webContents.on('before-input-event', (event, input) => {
     if (input.type !== 'keyDown' || input.key !== 'Escape') return;
     event.preventDefault();
-    hideOverlay();
+    if (overlayMode) setOverlayMode(false);
+    else hideOverlay();
   });
 
   /**
-   * Perder o foco com a janela visivel significa que o jogador voltou a jogar:
-   * o clique fora do painel (que o renderer deixa passar com `pointer-events-
-   * none`) chega ao jogo, e o overlay sai sozinho em vez de cobrir a tela.
+   * No modo overlay, perder o foco devolve a tela ao jogo.
    */
   overlayWindow.on('blur', () => {
-    if (overlayWindow?.isVisible()) hideOverlay();
+    if (overlayMode && overlayWindow?.isVisible()) hideOverlay();
   });
 
   overlayWindow.on('closed', () => {
     overlayWindow = null;
+    overlayMode = false;
   });
 
   return overlayWindow;
@@ -225,23 +214,42 @@ function createOverlayWindow() {
  * espera poder interagir. Quem so quiser olhar sem roubar o foco do jogo passa
  * pelo `overlay:show` do IPC, que repassa por aqui.
  */
+function setOverlayMode(enabled) {
+  if (overlayWindow === null || overlayWindow.isDestroyed()) return false;
+  overlayMode = enabled;
+  if (enabled) {
+    const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+    overlayWindow.setBounds(display.bounds);
+    overlayWindow.setFullScreen(true);
+    overlayWindow.setOpacity(OVERLAY_OPACITY);
+    overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    overlayWindow.setAlwaysOnTop(true, 'screen-saver');
+  } else {
+    const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+    const { x, y, width, height } = display.workArea;
+    overlayWindow.setAlwaysOnTop(false);
+    overlayWindow.setVisibleOnAllWorkspaces(false);
+    overlayWindow.setFullScreen(false);
+    overlayWindow.setOpacity(1);
+    overlayWindow.setBounds({
+      x: Math.round(x + (width - MAIN_WINDOW_WIDTH) / 2),
+      y: Math.round(y + (height - MAIN_WINDOW_HEIGHT) / 2),
+      width: MAIN_WINDOW_WIDTH,
+      height: MAIN_WINDOW_HEIGHT,
+    });
+  }
+  if (overlayWindow.isMinimized()) overlayWindow.restore();
+  overlayWindow.show();
+  overlayWindow.focus();
+  logMain('info', enabled ? '[MAIN] Modo overlay ativado' : '[MAIN] Modo desktop ativado');
+  return overlayMode;
+}
+
 function showOverlay() {
   if (overlayWindow === null) return;
   if (overlayWindow.isMinimized()) overlayWindow.restore();
-  
-  // Centraliza a janela na tela atual
-  const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
-  const { width, height } = display.workAreaSize;
-  overlayWindow.setPosition(
-    Math.round(width / 2 - OVERLAY_WIDTH / 2),
-    Math.round(height / 2 - OVERLAY_HEIGHT / 2)
-  );
-  
   overlayWindow.show();
-  overlayWindow.restore();
   overlayWindow.focus();
-  overlayWindow.setAlwaysOnTop(true, 'screen-saver');
-  logMain('info', '[MAIN] Overlay exibido');
 }
 
 /**
@@ -276,7 +284,7 @@ function createTray() {
   }).catch((error) => {
     console.warn('[MAIN] Nao foi possivel carregar o icone do Tray:', error);
   });
-  tray.setToolTip('PoE2 Craft Assistant - Pressione Alt+Q para abrir');
+  tray.setToolTip('PoE2 Craft Assistant - Pressione Alt+X para abrir');
 
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -391,7 +399,7 @@ function writeDataSnapshot(contents) {
  * binding que o SO nunca dispara.
  */
 const ACCELERATOR_RE = /^[A-Za-z0-9+'"`\-\[\]\\;,.//]+$/;
-const DEFAULT_ACCELERATOR = 'Alt+Q';
+const DEFAULT_ACCELERATOR = 'Alt+X';
 
 function sanitizeAccelerator(value) {
   if (typeof value !== 'string') return null;
@@ -413,22 +421,17 @@ function registerIpc() {
     };
   });
 
-  // O renderer le o clipboard pelo main: no Windows isso exige subprocesso.
-  ipcMain.handle('clipboard:read', () => {
-    const text = clipboard.readText();
-    logMain('info', '[MAIN] Clipboard lido via IPC', { length: text?.length || 0 });
-    return {
-      text,
-      capturedAt: Date.now(),
-    };
-  });
-
   ipcMain.handle('overlay:hide', () => {
     hideOverlay();
   });
 
   ipcMain.handle('overlay:show', () => {
     showOverlay();
+  });
+
+  ipcMain.handle('window:toggle-overlay', (_event, enabled) => {
+    const nextMode = typeof enabled === 'boolean' ? enabled : !overlayMode;
+    return setOverlayMode(nextMode);
   });
 
   ipcMain.handle('overlay:close', () => {
@@ -493,37 +496,6 @@ function registerIpc() {
   });
 }
 
-function startDevItemWatcher() {
-  const projectRoot = path.join(__dirname, '..');
-  const itemPath = path.join(projectRoot, 'dev-item.tmp');
-  devItemWatcher = watch(projectRoot, (_eventType, filename) => {
-    if (filename?.toString() !== 'dev-item.tmp') return;
-
-    if (devItemReadTimer !== null) clearTimeout(devItemReadTimer);
-    devItemReadTimer = setTimeout(() => {
-      devItemReadTimer = null;
-      try {
-        const rawItem = readFileSync(itemPath, 'utf8');
-        if (rawItem.trim() === '') return;
-
-        clipboard.writeText(rawItem);
-        if (overlayWindow) {
-          overlayWindow.webContents.send('item:parsed', { text: rawItem, capturedAt: Date.now() });
-          overlayWindow.show();
-          overlayWindow.restore();
-          overlayWindow.focus();
-          overlayWindow.setAlwaysOnTop(true, 'screen-saver');
-          console.log('[MAIN DEV] Item detectado via dev-item.tmp! Janela exibida.');
-        }
-      } catch (error) {
-        if (error?.code !== 'ENOENT') {
-          logMain('error', '[MAIN DEV] Falha ao ler dev-item.tmp', { error: String(error) });
-        }
-      }
-    }, 75);
-  });
-}
-
 /**
  * Erros nao tratados viram linha de log antes de qualquer outra coisa.
  *
@@ -545,7 +517,7 @@ app.whenReady().then(() => {
   if (Notification.isSupported()) {
     new Notification({
       title: 'PoE 2 Craft Assistant',
-      body: 'Overlay rodando! Pressione a hotkey (Alt+Q) com o mouse sobre um item no jogo.',
+      body: 'Overlay rodando! Pressione Alt+X sobre um item no jogo.',
     }).show();
   }
 
@@ -569,11 +541,6 @@ app.whenReady().then(() => {
   createTray();
   startGameMonitor();
 
-  // Observa o arquivo temporario usado pelo simulador, apenas com o servidor Vite.
-  if (process.env.VITE_DEV_SERVER_URL) {
-    startDevItemWatcher();
-  }
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createOverlayWindow();
   });
@@ -584,10 +551,6 @@ app.on('will-quit', () => {
   gameMonitor = null;
   mainHotkeys?.dispose();
   mainHotkeys = null;
-  devItemWatcher?.close();
-  devItemWatcher = null;
-  if (devItemReadTimer !== null) clearTimeout(devItemReadTimer);
-  devItemReadTimer = null;
   logMain('info', 'app encerrando');
 });
 

@@ -27,6 +27,7 @@ export interface OverlayState {
 export interface OverlayWindowProps {
   readonly state: OverlayState;
   readonly config: UserConfig;
+  readonly onToggleOverlay: () => void;
   readonly isGlobal: (action: HotkeyAction) => boolean;
   readonly onSetHotkey: (action: HotkeyAction, sequence: string) => Promise<HotkeyValidation>;
   readonly onPatch: (patch: ConfigPatch) => void;
@@ -64,6 +65,7 @@ export function OverlayWindow(props: OverlayWindowProps): ReactNode {
   const {
     state,
     config,
+    onToggleOverlay,
     isGlobal,
     onSetHotkey,
     onPatch,
@@ -160,6 +162,56 @@ export function OverlayWindow(props: OverlayWindowProps): ReactNode {
           </div>
         </div>
       </div>
+    );
+  }
+
+  if (state.item === null) {
+    return (
+      <main className="flex h-full flex-col bg-[#121212] px-8 py-7 text-slate-100 sm:px-12 sm:py-10">
+        <header className="flex items-start justify-between gap-6 border-b border-slate-800 pb-5">
+          <div>
+            <p className="text-xl font-semibold tracking-wide">PoE 2 Craft Assistant</p>
+            <p className="mt-2 text-sm text-emerald-400">🟢 Assistente Pronto e Ativo</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => { setTab('settings'); }}
+            className="rounded border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:border-slate-500 hover:text-white"
+          >
+            Ajustes
+          </button>
+        </header>
+
+        <section className="flex flex-1 flex-col justify-center py-8">
+          <p className="mb-3 text-xs font-medium uppercase tracking-widest text-emerald-400">Pronto para analisar</p>
+          <h1 className="max-w-2xl text-3xl font-semibold leading-tight">Capture um item para começar o craft.</h1>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300">
+            Copie o item no jogo com Ctrl+C e pressione Alt+X para abrir o overlay.
+          </p>
+          {state.error !== null && (
+            <p role="alert" className="mt-5 max-w-xl border-l-2 border-amber-400 bg-amber-950/30 px-4 py-3 text-sm text-amber-200">
+              {state.error}
+            </p>
+          )}
+          <div className="mt-8 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={onToggleOverlay}
+              className="rounded bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-slate-950 hover:bg-emerald-400"
+            >
+              Minimizar / Entrar em Modo Overlay
+            </button>
+            <button
+              type="button"
+              onClick={() => { setTab('feedback'); }}
+              className="rounded border border-slate-700 px-4 py-2.5 text-sm text-slate-300 hover:border-slate-500 hover:text-white"
+            >
+              Feedback
+            </button>
+          </div>
+        </section>
+        <DataStatusBar status={dataStatus} onRefresh={onRefreshData} />
+      </main>
     );
   }
 

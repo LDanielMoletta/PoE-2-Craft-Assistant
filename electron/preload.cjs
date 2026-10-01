@@ -15,6 +15,7 @@ const electronApi = {
   hide: () => ipcRenderer.invoke('overlay:hide'),
   show: () => ipcRenderer.invoke('overlay:show'),
   close: () => ipcRenderer.invoke('overlay:close'),
+  toggleOverlayMode: (enabled) => ipcRenderer.invoke('window:toggle-overlay', enabled),
   send: (channel) => {
     if (channel === 'app:quit') ipcRenderer.send(channel);
   },
@@ -82,6 +83,12 @@ const electronApi = {
     return () => {
       ipcRenderer.removeListener('item:parsed', listener);
     };
+  },
+  onItemInvalid: (handler) => {
+    if (typeof handler !== 'function') return () => {};
+    const listener = (_event, message) => handler(message);
+    ipcRenderer.on('window:item-invalid', listener);
+    return () => ipcRenderer.removeListener('window:item-invalid', listener);
   },
 };
 

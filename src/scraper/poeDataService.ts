@@ -25,8 +25,10 @@ export interface PoeDataServiceOptions {
   readonly modsIndex?: ModsIndex | null;
 }
 
-const DEFAULT_WIKI_BASE_URL = process.env['POE2_WIKI_MODIFIER_BASE_URL'] ?? 'https://www.poe2wiki.net';
-const DEFAULT_LEAGUE = process.env['POE2_LEAGUE'] ?? 'Standard';
+const DEFAULT_WIKI_BASE_URL = typeof process === 'undefined'
+  ? 'https://www.poe2wiki.net'
+  : process.env['POE2_WIKI_MODIFIER_BASE_URL'] ?? 'https://www.poe2wiki.net';
+const DEFAULT_LEAGUE = typeof process === 'undefined' ? 'Standard' : process.env['POE2_LEAGUE'] ?? 'Standard';
 
 /** Resposta da trade API ao buscar listagens de uma moeda. */
 interface TradeFetchResponse {
@@ -504,7 +506,7 @@ export class PoeDataService {
     const cached = this.#cache.get(key);
     if (cached) return cached.payload as number;
 
-    const tradeBase = process.env['POE2_TRADE_SEARCH_URL'];
+    const tradeBase = typeof process === 'undefined' ? undefined : process.env['POE2_TRADE_SEARCH_URL'];
     if (!tradeBase) return null;
 
     try {

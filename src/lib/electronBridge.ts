@@ -54,6 +54,16 @@ export const electronBridge = {
     }
   },
 
+  async toggleOverlayMode(enabled?: boolean): Promise<boolean> {
+    const api = nativeApi();
+    if (typeof api?.toggleOverlayMode !== 'function') return false;
+    try {
+      return await api.toggleOverlayMode(enabled);
+    } catch {
+      return false;
+    }
+  },
+
   async readClipboard(): Promise<{ readonly text: string; readonly capturedAt: number }> {
     const api = nativeApi();
     if (typeof api?.readClipboard === 'function') {
@@ -161,6 +171,16 @@ export const electronBridge = {
     if (typeof api?.onItemParsed !== 'function') return noop;
     try {
       return api.onItemParsed(handler);
+    } catch {
+      return noop;
+    }
+  },
+
+  onItemInvalid(handler: Parameters<ElectronApi['onItemInvalid']>[0]): () => void {
+    const api = nativeApi();
+    if (typeof api?.onItemInvalid !== 'function') return noop;
+    try {
+      return api.onItemInvalid(handler);
     } catch {
       return noop;
     }

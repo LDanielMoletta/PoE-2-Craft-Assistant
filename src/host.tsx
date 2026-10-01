@@ -384,6 +384,10 @@ export function OverlayHost(): ReactNode {
     });
   }, [applyCapturedItem]);
 
+  useEffect(() => {
+    return electronBridge.onItemInvalid((message) => setError(message));
+  }, []);
+
   const handleClose = useCallback(() => {
     electronBridge.hide();
   }, []);
@@ -442,6 +446,7 @@ export function OverlayHost(): ReactNode {
     <OverlayWindow
       state={state}
       config={config}
+      onToggleOverlay={() => { void electronBridge.toggleOverlayMode(true); }}
       isGlobal={isGlobal}
       onSetHotkey={handleSetHotkey}
       onPatch={handlePatch}

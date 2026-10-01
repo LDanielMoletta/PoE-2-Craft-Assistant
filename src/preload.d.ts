@@ -7,6 +7,8 @@ export interface OverlayHostApi {
   /** Mostra a janela e traz para frente. */
   show(): void;
   close(): void;
+  /** Alterna o modo fullscreen/semitransparente sem recriar a janela. */
+  toggleOverlayMode(enabled?: boolean): Promise<boolean>;
   /** Envia apenas o comando permitido de encerramento ao processo main. */
   send(channel: 'app:quit'): void;
   /** Assina o comando para abrir a aba de configurações vindo do Tray. */
@@ -53,6 +55,8 @@ export interface OverlayHostApi {
   sendFeedback(payload: FeedbackPayload): Promise<FeedbackDeliveryResult>;
   /** Escuta o item parseado vindo do main (dev ou hotkey real). */
   onItemParsed(handler: (payload: { text: string; capturedAt: number }) => void): () => void;
+  /** Escuta erros de captura enviados pelo processo main. */
+  onItemInvalid(handler: (message: string) => void): () => void;
 }
 
 export interface ClipboardSnapshot {

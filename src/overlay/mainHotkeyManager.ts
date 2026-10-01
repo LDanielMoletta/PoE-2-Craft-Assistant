@@ -1,21 +1,6 @@
 import { parseSequence, validateHotkey } from './hotkeyValidation.js';
 
 /**
- * Envia `Ctrl+C` para o SO antes de ler a area de transferencia.
- * 
- * NOTA: A implementacao real com `robotjs`/`PowerShell`/`xdotool` esta apenas no
- * arquivo CommonJS `electron/mainHotkeyManager.cjs`, que roda no processo main.
- * Este arquivo TypeScript e' usado apenas para testes e nao inclui a logica de
- * auto-captura para evitar problemas de bundling com modulos nativos (`robotjs`).
- * 
- * Os testes usam `SimulatedHotkeySource` que nao precisa de auto-captura real.
- */
-async function sendCtrlC(): Promise<void> {
-  // No-op na versao TypeScript (usada apenas para testes).
-  // A implementacao real esta em `electron/mainHotkeyManager.cjs`.
-}
-
-/**
  * Registro do atalho global no processo main do Electron.
  *
  * Vive aqui, e nao no renderer, porque em tela cheia o PoE2 entra em modo
@@ -54,6 +39,7 @@ export interface MainHotkeyManagerOptions {
   readonly backend: GlobalShortcutBackend;
   readonly clipboard: MainClipboardSource;
   readonly onCaptured: ItemCapturedSink;
+  readonly onInvalid?: (message: string) => void;
   readonly isPoE2Focused?: () => boolean;
   readonly now?: () => number;
   readonly verbose?: boolean;
@@ -151,6 +137,7 @@ export class MainHotkeyManager {
   readonly #backend: GlobalShortcutBackend;
   readonly #clipboard: MainClipboardSource;
   readonly #onCaptured: ItemCapturedSink;
+  readonly #onInvalid: (message: string) => void;
   readonly #isPoE2Focused: (() => boolean) | undefined;
   readonly #now: () => number;
   readonly #verbose: boolean;
@@ -162,6 +149,7 @@ export class MainHotkeyManager {
     this.#backend = options.backend;
     this.#clipboard = options.clipboard;
     this.#onCaptured = options.onCaptured;
+    this.#onInvalid = options.onInvalid ?? ((message) => console.log(`[hotkey:main] ${message}`));
     this.#isPoE2Focused = options.isPoE2Focused;
     this.#now = options.now ?? Date.now;
     this.#verbose = options.verbose ?? false;
@@ -260,17 +248,18 @@ export class MainHotkeyManager {
 
     let text = '';
     try {
-      // Auto-captura: envia Ctrl+C para o jogo copiar o item antes de ler o clipboard
-      sendCtrlC().catch((err) => {
-        if (this.#verbose) console.warn(`[hotkey:main] sendCtrlC falhou: ${err}`);
-      });
       text = this.#clipboard.readText();
     } catch (error) {
-      // O jogador acabou de apertar a tecla e precisa de alguma resposta na
-      // tela; texto vazio e melhor do que engasgar o atalho.
       if (this.#verbose) {
         console.warn(`[hotkey:main] clipboard: ${error instanceof Error ? error.message : String(error)}`);
       }
+      this.#onInvalid('Nenhum item válido detectado no Clipboard');
+      return;
+    }
+
+    if (!/Rarity:|Item Class:/i.test(text)) {
+      this.#onInvalid('Nenhum item válido detectado no Clipboard');
+      return;
     }
 
     if (this.#verbose) {

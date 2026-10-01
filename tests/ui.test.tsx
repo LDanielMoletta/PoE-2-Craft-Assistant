@@ -343,6 +343,7 @@ describe('SettingsModal', () => {
 describe('OverlayWindow', () => {
   const baseProps = {
     config: DEFAULT_USER_CONFIG,
+    onToggleOverlay: noop,
     isGlobal: (action: HotkeyAction) => action === 'triggerOverlay',
     onSetHotkey: async (_action: HotkeyAction, sequence: string) =>
       validateHotkey(sequence, { asGlobal: true }),
@@ -371,10 +372,26 @@ describe('OverlayWindow', () => {
     },
   };
 
-  it('convida a copiar um item quando nao ha captura', () => {
+  it('mostra o dashboard ativo quando nao ha item', () => {
     render(<OverlayWindow {...baseProps} state={emptyState} />);
-    expect(screen.getByText(/Copie um item/)).toBeDefined();
-    expect(screen.getByText('Alt+E')).toBeDefined();
+    expect(screen.getByText('PoE 2 Craft Assistant')).toBeDefined();
+    expect(screen.getByText('🟢 Assistente Pronto e Ativo')).toBeDefined();
+    expect(screen.getByText(/Copie o item no jogo com Ctrl\+C/)).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Minimizar / Entrar em Modo Overlay' })).toBeDefined();
+  });
+
+  it('ativa o modo overlay pelo botao do dashboard', () => {
+    let activated = false;
+    render(<OverlayWindow {...baseProps} onToggleOverlay={() => { activated = true; }} state={emptyState} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Minimizar / Entrar em Modo Overlay' }));
+
+    expect(activated).toBe(true);
+  });
+
+  it('exibe o alerta do clipboard no dashboard vazio', () => {
+    render(<OverlayWindow {...baseProps} state={{ ...emptyState, error: 'Nenhum item válido detectado no Clipboard' }} />);
+    expect(screen.getByRole('alert')).toHaveTextContent('Nenhum item válido detectado no Clipboard');
   });
 
   it('mostra item, alvo e plano quando existe captura', () => {
@@ -405,6 +422,6 @@ describe('OverlayWindow', () => {
     expect(screen.getByText('Orçamento padrão')).toBeDefined();
 
     fireEvent.click(screen.getByText('Fechar'));
-    expect(screen.getByText(/Copie um item/)).toBeDefined();
+    expect(screen.getByText('PoE 2 Craft Assistant')).toBeDefined();
   });
 });
