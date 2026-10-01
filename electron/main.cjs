@@ -144,6 +144,7 @@ function createHotkeyManager() {
       if (!overlayWindow || overlayWindow.isDestroyed()) return;
       if (overlayWindow.isMinimized()) overlayWindow.restore();
       overlayWindow.show();
+      overlayWindow.focus();
       overlayWindow.webContents.send('window:item-invalid', message);
     },
     verbose: process.env.POE2_DEBUG_HOTKEY === '1',
@@ -284,9 +285,19 @@ function createTray() {
   }).catch((error) => {
     console.warn('[MAIN] Nao foi possivel carregar o icone do Tray:', error);
   });
-  tray.setToolTip('PoE2 Craft Assistant - Pressione Alt+X para abrir');
+  tray.setToolTip('PoE 2 Craft Assistant - Pressione Alt+X para abrir overlay');
 
   const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Abrir Janela Principal',
+      click: () => {
+        showOverlay();
+        if (!overlayWindow) return;
+        if (overlayWindow.isMinimized()) overlayWindow.restore();
+        overlayWindow.show();
+        overlayWindow.focus();
+      },
+    },
     {
       label: 'Abrir Configurações',
       click: () => {
@@ -312,10 +323,16 @@ function createTray() {
 
   tray.setContextMenu(contextMenu);
   
-  // Clique no icone alterna a visibilidade do overlay.
-  tray.on('click', () => {
-    if (overlayWindow?.isVisible()) hideOverlay();
-    else showOverlay();
+  // Click simples: nada (evita abrir/fechar acidental)
+  // Double-click: abre a janela principal
+  tray.on('double-click', () => {
+    if (overlayWindow) {
+      if (overlayWindow.isMinimized()) overlayWindow.restore();
+      overlayWindow.show();
+      overlayWindow.focus();
+    } else {
+      createOverlayWindow();
+    }
   });
 
   // Guarda referencia para nao ser coletado pelo GC
@@ -534,7 +551,13 @@ app.whenReady().then(() => {
   createOverlayWindow();
   // Rede de seguranca: se a UI nao carregar, o atalho padrao ainda responde em
   // vez de o app parecer morto. O renderer sobrescreve assim que ler o config.
-  mainHotkeys.bind(DEFAULT_ACCELERATOR);
+  const hotkeyStatus = mainHotkeys.bind(DEFAULT_ACCELERATOR);
+  console.log('[MAIN] Hotkey status after bind:', hotkeyStatus);
+  logMain('info', '[MAIN] Hotkey status after bind', hotkeyStatus);
+  if (!hotkeyStatus.registered) {
+    console.warn('[MAIN] ATENCAO: Hotkey Alt+X nao foi registrada! Verifique se outra app (Awakened PoE Trade, etc) esta usando Alt+X.');
+    logMain('warn', '[MAIN] Hotkey Alt+X nao foi registrada - possivel conflito com outro overlay');
+  }
 
   // System Tray: mostra que o app esta rodando em segundo plano.
   // O usuario pode clicar para abrir o overlay ou sair.
